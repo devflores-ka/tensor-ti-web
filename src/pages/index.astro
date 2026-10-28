@@ -1,16 +1,62 @@
 ---
+const year = new Date().getFullYear();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Tensor TI SpA: soporte técnico, consultoría de proyectos, telecomunicaciones y seguridad electrónica. Pozo Almonte, Región de Tarapacá." />
+    <link rel="icon" href="/tensor-logo.svg" />
+    <title>Tensor TI | Sitio en construcción</title>
+  </head>
+  <body>
+    <main>
+      <img src="/tensor-logo.svg" alt="Logo Tensor TI" width="160" />
+      <h1>Tensor TI</h1>
+      <p class="lead">Estamos construyendo nuestro sitio web.</p>
+      <p>Soporte técnico y consultoría de proyectos en tecnología, telecomunicaciones y seguridad electrónica.</p>
+      <p class="contact">Contacto: <a href="mailto:lucianoflores2022@hotmail.com">contacto@tensorti.cl</a></p>
+      <footer>© {year} Tensor TI SpA · Pozo Almonte, Chile</footer>
+    </main>
+  </body>
 </html>
+
+<style>
+  :root {
+    --azul: #1c1a4e;
+    --terracota: #b55d44;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--azul);
+    color: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: center;
+  }
+  main {
+    padding: 2rem;
+    max-width: 36rem;
+  }
+  h1 {
+    margin: 1rem 0 0.25rem;
+    font-size: 2.5rem;
+  }
+  .lead {
+    color: var(--terracota);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  a {
+    color: var(--terracota);
+  }
+  footer {
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+</style>

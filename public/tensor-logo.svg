@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Tensor TI</title>
+  <desc id="desc">Geometric navy T emblem with copper panels and white circuit traces.</desc>
+  <!-- Transparent background; the emblem is built from editable vector shapes. -->
+  <path fill="#19194F" d="M86 29H938a29 29 0 0 1 29 29v276a29 29 0 0 1-29 29H672v665a29 29 0 0 1-29 29H347a29 29 0 0 1-29-29V363H58a29 29 0 0 1-29-29V58a29 29 0 0 1 29-29Z"/>
+  <g fill="#B95B40" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round">
+    <path d="M105 120H550L313 294H105Z"/>
+    <path d="M318 372 405 317V766L318 852Z" stroke="none"/>
+    <path d="M318 372 405 317V766L318 852Z" fill="#B95B40" stroke="#FFFFFF"/>
+    <circle cx="626" cy="119" r="25"/>
+    <circle cx="929" cy="119" r="25"/>
+    <circle cx="429" cy="877" r="29"/>
+  </g>
+  <g fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M550 120H601"/>
+    <path d="M651 120H904"/>
+    <path d="M929 144V297H611V877H458"/>
+    <path d="M318 372 626 160"/>
+    <path d="M509 365V650"/>
+  </g>
+</svg>
