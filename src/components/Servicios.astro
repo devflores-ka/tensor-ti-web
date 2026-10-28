@@ -1,0 +1,72 @@
+---
+const principales = [
+  {
+    t: "Soporte TI en terreno",
+    d: "Atención presencial en oficinas, faenas y establecimientos: diagnóstico, resolución y seguimiento.",
+  },
+  {
+    t: "Redes y conectividad",
+    d: "Cableado estructurado, fibra óptica, enlaces inalámbricos y puesta en marcha de redes.",
+  },
+  {
+    t: "Auditoría informática",
+    d: "Levantamiento de equipos, redes y software, con informe de hallazgos y recomendaciones.",
+  },
+  {
+    t: "Reparación, mantención y montaje de PC en volumen",
+    d: "Mantención preventiva y correctiva de parques de equipos, y montaje de puestos de trabajo completos.",
+  },
+];
+const tambien = [
+  "Seguridad electrónica (CCTV, control de acceso)",
+  "Venta de equipos, licencias y repuestos",
+  "Personal técnico para faenas",
+  "Desarrollo de software a medida",
+];
+---
+<section id="servicios">
+  <div class="wrap">
+    <p class="etiqueta">Servicios</p>
+    <h2>Lo que hacemos</h2>
+
+    <ol class="lista">
+      {principales.map((s, i) => (
+        <li>
+          <span class="num">{String(i + 1).padStart(2, "0")}</span>
+          <div>
+            <h3>{s.t}</h3>
+            <p>{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <p class="etiqueta tambien-t">También</p>
+    <ul class="tambien">
+      {tambien.map((t) => <li>{t}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
+  .lista li {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 1rem;
+    padding: 1.8rem 0;
+    border-bottom: 1px solid var(--linea);
+  }
+  .num { font-family: var(--mono); color: var(--terracota); font-size: 1.1rem; padding-top: 0.2rem; }
+  h3 { font-size: 1.35rem; margin-bottom: 0.4rem; }
+  .lista p { margin: 0; color: var(--gris); max-width: 42rem; }
+  .tambien-t { margin-top: 2.5rem; }
+  .tambien { display: flex; flex-wrap: wrap; gap: 0.6rem; list-style: none; padding: 0; margin: 0.8rem 0 0; }
+  .tambien li {
+    border: 1px solid var(--linea);
+    padding: 0.5rem 0.9rem;
+    border-radius: 2rem;
+    font-size: 0.95rem;
+    color: var(--gris);
+  }
+</style>

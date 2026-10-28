@@ -1,0 +1,30 @@
+---
+import { site } from "../data/site";
+const wa = site.whatsapp
+  ? `https://wa.me/${site.whatsapp}?text=${encodeURIComponent("Hola, quisiera cotizar un servicio con Tensor TI.")}`
+  : null;
+---
+<section id="contacto" class="contacto">
+  <div class="wrap">
+    <p class="etiqueta">Contacto</p>
+    <h2>Cuéntanos qué necesitas</h2>
+    <p class="intro">Te respondemos con una propuesta y los plazos.</p>
+
+    <dl>
+      <div><dt>Correo</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+      <div><dt>Teléfono</dt><dd><a href={`tel:${site.telefonoLink}`}>{site.telefono}</a></dd></div>
+      <div><dt>Ubicación</dt><dd>{site.ubicacion}</dd></div>
+    </dl>
+
+    {wa && <a class="btn btn-primario" href={wa}>Escribir por WhatsApp</a>}
+  </div>
+</section>
+
+<style>
+  .contacto { background: var(--azul-osc); color: #fff; }
+  .intro { color: rgba(255, 255, 255, 0.8); margin: -1.5rem 0 2rem; }
+  dl { display: grid; gap: 1.2rem; margin: 0 0 2rem; }
+  dt { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terracota); }
+  dd { margin: 0.2rem 0 0; font-size: 1.2rem; }
+  dd a { color: #fff; }
+</style>

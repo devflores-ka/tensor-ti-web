@@ -1,0 +1,54 @@
+:root {
+  --azul: #1c1a4e;
+  --azul-osc: #131139;
+  --terracota: #b55d44;
+  --terracota-osc: #9a4a33;
+  --papel: #f6f4ef;
+  --tinta: #16153a;
+  --gris: #5b5b73;
+  --linea: #dcd8cf;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--tinta);
+  background: var(--papel);
+  line-height: 1.6;
+}
+
+.wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+section { padding: 5rem 0; }
+
+h1, h2, h3 { letter-spacing: -0.02em; line-height: 1.12; margin: 0; }
+h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin: 0.6rem 0 2.5rem; }
+
+.etiqueta {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--terracota);
+  margin: 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.85rem 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.4rem;
+  border: 2px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-primario { background: var(--terracota); color: #fff; }
+.btn-primario:hover { background: var(--terracota-osc); }
+.btn-borde { border-color: rgba(255, 255, 255, 0.45); color: #fff; }
+.btn-borde:hover { background: rgba(255, 255, 255, 0.1); }
+
+:focus-visible { outline: 3px solid var(--terracota); outline-offset: 3px; }

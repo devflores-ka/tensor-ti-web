@@ -1,0 +1,80 @@
+---
+import { site } from "../data/site";
+const wa = site.whatsapp
+  ? `https://wa.me/${site.whatsapp}?text=${encodeURIComponent("Hola, quisiera cotizar un servicio con Tensor TI.")}`
+  : null;
+---
+<section id="inicio" class="hero">
+  <!-- Textura de circuito. Más adelante, aquí puede ir la animación del header. -->
+  <svg class="trazas" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5">
+      <path d="M0 120 H260 L340 60 H700" />
+      <path d="M0 560 H180 L260 640 H520 L600 560 H900" />
+      <path d="M700 60 H980 V200 H1200" />
+      <path d="M900 560 H1100 V420 H1200" />
+      <path d="M340 60 V0" />
+      <path d="M520 640 V700" />
+    </g>
+    <g fill="#b55d44" opacity="0.7">
+      <circle cx="700" cy="60" r="5" />
+      <circle cx="980" cy="200" r="5" />
+      <circle cx="900" cy="560" r="5" />
+      <circle cx="260" cy="120" r="5" />
+    </g>
+  </svg>
+
+  <div class="wrap grid">
+    <div class="texto">
+      <p class="etiqueta">{site.ubicacion}</p>
+      <h1>Soporte TI en terreno para empresas e instituciones.</h1>
+      <p class="sub">
+        Redes, auditoría y mantención de parques de computadores en gran volumen.
+        Vamos donde están tus equipos.
+      </p>
+      <div class="acciones">
+        {wa
+          ? <a class="btn btn-primario" href={wa}>Escríbenos por WhatsApp</a>
+          : <a class="btn btn-primario" href={`mailto:${site.email}`}>Escríbenos</a>}
+        <a class="btn btn-borde" href="#servicios">Ver servicios</a>
+      </div>
+    </div>
+    <div class="logo-box">
+      <img src="/tensor-logo.svg" alt="Logo Tensor TI" width="150" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--azul);
+    color: #fff;
+    padding: 9rem 0 6rem;
+  }
+  .trazas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  h1 { font-size: clamp(2.2rem, 5.2vw, 3.8rem); margin: 1rem 0 1.4rem; }
+  .sub { font-size: 1.15rem; max-width: 34rem; color: rgba(255, 255, 255, 0.82); margin: 0 0 2rem; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+  .logo-box {
+    justify-self: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  }
+  .logo-box img { display: block; }
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+    .logo-box { justify-self: start; order: -1; padding: 1.2rem; }
+    .logo-box img { width: 90px; }
+    .hero { padding-top: 7rem; }
+  }
+</style>

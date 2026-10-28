@@ -1,0 +1,41 @@
+---
+const pasos = [
+  { t: "Levantamiento", d: "Visitamos, revisamos el estado de equipos y redes, y definimos el alcance contigo." },
+  { t: "Ejecución en terreno", d: "Trabajamos con un plan y plazos acordados, minimizando la interrupción de tu operación." },
+  { t: "Informe y soporte", d: "Te entregamos el detalle de lo realizado y seguimos disponibles ante cualquier problema." },
+];
+---
+<section id="metodo" class="metodo">
+  <div class="wrap">
+    <p class="etiqueta">Cómo trabajamos</p>
+    <h2>Simple y ordenado</h2>
+    <div class="pasos">
+      {pasos.map((p, i) => (
+        <div class="paso">
+          <span class="n">{i + 1}</span>
+          <h3>{p.t}</h3>
+          <p>{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .metodo { background: #ebe7dd; }
+  .pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+  .n {
+    display: inline-grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--azul);
+    color: #fff;
+    font-family: var(--mono);
+    margin-bottom: 1rem;
+  }
+  h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+  p { margin: 0; color: var(--gris); }
+  @media (max-width: 800px) { .pasos { grid-template-columns: 1fr; gap: 2rem; } }
+</style>

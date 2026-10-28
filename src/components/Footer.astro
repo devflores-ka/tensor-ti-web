@@ -1,0 +1,12 @@
+---
+import { site } from "../data/site";
+---
+<footer>
+  <div class="wrap">
+    © {new Date().getFullYear()} {site.razonSocial} · RUT {site.rut} · {site.ubicacion}
+  </div>
+</footer>
+
+<style>
+  footer { background: var(--azul-osc); color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; padding: 1.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+</style>
