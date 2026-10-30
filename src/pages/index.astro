@@ -1,22 +1,17 @@
 ---
 import Base from "../layouts/Base.astro";
-import Header from "../components/Header.astro";
 import Hero from "../components/Hero.astro";
 import Servicios from "../components/Servicios.astro";
+import BandaSoporteMensual from "../components/BandaSoporteMensual.astro";
 import Metodo from "../components/Metodo.astro";
-import Contacto from "../components/Contacto.astro";
-import Footer from "../components/Footer.astro";
 ---
 <Base
-  title="Tensor TI | Soporte TI en terreno, redes y auditoría"
-  description="Tensor TI SpA: soporte TI en terreno, redes, auditoría informática y mantención de equipos en gran volumen para empresas e instituciones. Pozo Almonte, Tarapacá."
+  title="Tensor TI | Soporte TI y redes en Pozo Almonte, Tarapacá"
+  description="Soporte TI en terreno, redes, auditoría y mantención de equipos en gran volumen para empresas e instituciones de Tarapacá. Tensor TI, Pozo Almonte."
+  path="/"
 >
-  <Header />
-  <main>
-    <Hero />
-    <Servicios />
-    <Metodo />
-    <Contacto />
-  </main>
-  <Footer />
+  <Hero />
+  <Servicios />
+  <BandaSoporteMensual />
+  <Metodo />
 </Base>

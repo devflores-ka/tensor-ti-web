@@ -1,0 +1,83 @@
+---
+// Cabecera de las páginas interiores. Mantiene el estilo del hero del inicio
+// (azul + trazas de circuito) en una versión más baja.
+interface Props {
+  etiqueta?: string;
+  titulo: string;
+  lead?: string;
+  /** Migas de pan; la última es la página actual y no lleva enlace. */
+  migas?: { nombre: string; href?: string }[];
+}
+const { etiqueta, titulo, lead, migas = [] } = Astro.props;
+---
+<section class="page-hero oscuro">
+  <svg class="trazas" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5">
+      <path d="M0 90 H260 L340 40 H700" />
+      <path d="M700 40 H980 V140 H1200" />
+      <path d="M0 330 H180 L260 380 H520 L600 330 H900" />
+      <path d="M900 330 H1100 V260 H1200" />
+    </g>
+    <g fill="#b55d44" opacity="0.7">
+      <circle cx="700" cy="40" r="5" />
+      <circle cx="980" cy="140" r="5" />
+      <circle cx="260" cy="90" r="5" />
+    </g>
+  </svg>
+
+  <div class="wrap contenido">
+    {migas.length > 0 && (
+      <nav class="migas" aria-label="Ruta de navegación">
+        <ol>
+          {migas.map((m, i) => (
+            <li>
+              {m.href && i < migas.length - 1
+                ? <a href={m.href}>{m.nombre}</a>
+                : <span aria-current="page">{m.nombre}</span>}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+    {etiqueta && <p class="etiqueta">{etiqueta}</p>}
+    <h1>{titulo}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <div class="extra"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--azul);
+    color: #fff;
+    padding: 8rem 0 4rem;
+  }
+  .trazas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .contenido { position: relative; }
+  .migas ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0 0 1.4rem;
+    padding: 0;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .migas li + li::before { content: "/"; margin-right: 0.4rem; opacity: 0.6; }
+  .migas a { color: rgba(255, 255, 255, 0.85); }
+  .migas a:hover { color: #fff; }
+  h1 { font-size: clamp(2rem, 4.8vw, 3.2rem); margin: 0.8rem 0 1rem; max-width: 46rem; }
+  .lead {
+    font-size: 1.15rem;
+    max-width: 42rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+  }
+  .extra:not(:empty) { margin-top: 2rem; }
+  @media (max-width: 800px) {
+    .page-hero { padding-top: 7rem; }
+  }
+</style>

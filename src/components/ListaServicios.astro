@@ -1,0 +1,45 @@
+---
+// Lista numerada de servicios, con enlace a la página de cada uno.
+import type { Servicio } from "../data/servicios";
+import { rutaServicio } from "../data/servicios";
+
+interface Props {
+  items: Servicio[];
+  /** Usa el título abreviado del home cuando existe. */
+  tituloHome?: boolean;
+}
+const { items, tituloHome = false } = Astro.props;
+---
+<ol class="lista">
+  {items.map((s, i) => (
+    <li>
+      <span class="num">{String(i + 1).padStart(2, "0")}</span>
+      <div>
+        <h3><a href={rutaServicio(s.slug)}>{tituloHome ? (s.homeTitulo ?? s.nombre) : s.nombre}</a></h3>
+        <p>{s.corto}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
+  .lista li {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 1rem;
+    padding: 1.8rem 0;
+    border-bottom: 1px solid var(--linea);
+  }
+  .num {
+    font-family: var(--mono);
+    color: var(--terracota-texto);
+    font-size: 1.1rem;
+    padding-top: 0.2rem;
+  }
+  h3 { font-size: 1.35rem; margin-bottom: 0.4rem; }
+  h3 a { color: inherit; text-decoration: none; }
+  h3 a::after { content: " →"; color: var(--terracota-texto); }
+  h3 a:hover { text-decoration: underline; text-decoration-color: var(--terracota); text-underline-offset: 0.2em; }
+  p { margin: 0; color: var(--gris); max-width: 42rem; }
+</style>

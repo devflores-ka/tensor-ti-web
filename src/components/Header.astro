@@ -1,21 +1,148 @@
-<header class="top">
+---
+const enlaces = [
+  { href: "/servicios", texto: "Servicios" },
+  { href: "/precios", texto: "Precios" },
+  { href: "/contacto", texto: "Contacto" },
+];
+const actual = Astro.url.pathname;
+const esActual = (href: string) => actual === href || actual.startsWith(href + "/");
+---
+<header class="top oscuro">
   <div class="wrap bar">
-    <a href="#inicio" class="marca">Tensor<span>TI</span></a>
-    <nav aria-label="Principal">
-      <a href="#servicios">Servicios</a>
-      <a href="#metodo">Cómo trabajamos</a>
-      <a href="#contacto">Contacto</a>
+    <a href="/" class="marca" aria-label="Tensor TI, ir al inicio">
+      <span class="chip"><img src="/tensor-logo.svg" alt="" width="30" height="32" /></span>
+      <span>Tensor<span class="ti">TI</span></span>
+    </a>
+
+    <button
+      class="menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu-principal"
+    >
+      <span class="solo-lectores">Abrir o cerrar el menú</span>
+      <span class="barras" aria-hidden="true"></span>
+    </button>
+
+    <nav id="menu-principal" class="menu" aria-label="Principal">
+      {enlaces.map((e) => (
+        <a href={e.href} aria-current={esActual(e.href) ? "page" : undefined}>{e.texto}</a>
+      ))}
+      <a class="btn btn-primario btn-sm" href="/contacto">Cotizar</a>
     </nav>
   </div>
 </header>
 
+<noscript>
+  <style>
+    @media (max-width: 720px) {
+      .menu { display: flex !important; position: static !important; background: none !important; padding: 0 !important; }
+      .menu-btn { display: none !important; }
+    }
+  </style>
+</noscript>
+
 <style>
-  .top { position: absolute; inset: 0 0 auto 0; z-index: 2; }
-  .bar { display: flex; justify-content: space-between; align-items: center; padding-block: 1.4rem; }
-  .marca { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.2rem; }
-  .marca span { color: var(--terracota); margin-left: 0.3rem; }
-  nav { display: flex; gap: 1.6rem; }
-  nav a { color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem; }
-  nav a:hover { color: #fff; }
-  @media (max-width: 640px) { nav a:not(:last-child) { display: none; } }
+  .top { position: absolute; inset: 0 0 auto 0; z-index: 5; }
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1.4rem;
+    position: relative;
+  }
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .marca .ti { color: var(--terracota-claro); margin-left: 0.3rem; }
+  .chip {
+    display: grid;
+    place-items: center;
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.4rem;
+  }
+  .chip img { display: block; height: 2rem; width: auto; }
+
+  .menu { display: flex; align-items: center; gap: 1.6rem; }
+  .menu a:not(.btn) {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding-block: 0.3rem;
+    border-bottom: 2px solid transparent;
+  }
+  .menu a:not(.btn):hover { color: #fff; }
+  .menu a[aria-current="page"] { color: #fff; border-bottom-color: var(--terracota-claro); }
+
+  .menu-btn {
+    display: none;
+    background: none;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-radius: 0.4rem;
+    width: 2.8rem;
+    height: 2.8rem;
+    cursor: pointer;
+    padding: 0;
+    place-items: center;
+  }
+  .barras,
+  .barras::before,
+  .barras::after {
+    display: block;
+    width: 1.2rem;
+    height: 2px;
+    background: #fff;
+    position: relative;
+    content: "";
+  }
+  .barras::before { position: absolute; top: -6px; }
+  .barras::after { position: absolute; top: 6px; }
+
+  @media (max-width: 720px) {
+    .menu-btn { display: grid; }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.4rem;
+      background: var(--azul-osc);
+      padding: 1rem 1.25rem 1.4rem;
+      border-radius: 0.6rem;
+    }
+    .menu[data-abierto] { display: flex; }
+    .menu a:not(.btn) { padding: 0.7rem 0; font-size: 1.05rem; }
+    .menu .btn { text-align: center; margin-top: 0.4rem; }
+  }
 </style>
+
+<script>
+  const boton = document.querySelector<HTMLButtonElement>(".menu-btn");
+  const menu = document.getElementById("menu-principal");
+
+  function alternar(abrir: boolean) {
+    if (!boton || !menu) return;
+    boton.setAttribute("aria-expanded", String(abrir));
+    menu.toggleAttribute("data-abierto", abrir);
+  }
+
+  boton?.addEventListener("click", () => {
+    alternar(boton.getAttribute("aria-expanded") !== "true");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") alternar(false);
+  });
+  menu?.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("a")) alternar(false);
+  });
+</script>

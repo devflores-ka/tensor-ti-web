@@ -1,0 +1,72 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import PlanesSoporte from "../components/PlanesSoporte.astro";
+import Cotizador from "../components/Cotizador.astro";
+import CtaBanda from "../components/CtaBanda.astro";
+import { planes, planesConfig, formatoUF } from "../data/planes";
+import { breadcrumbLd } from "../lib/seo";
+
+const minimo = planes
+  .map((p) => p.desdeUF)
+  .filter((n): n is number => n !== null)
+  .sort((a, b) => a - b)[0];
+
+const descripcion =
+  planesConfig.mostrarPrecios && minimo !== undefined
+    ? `Planes de soporte TI mensual desde ${formatoUF(minimo)} ${planesConfig.unidad} y cotizador de servicios: soporte, redes, CCTV, mantención y auditoría.`
+    : "Planes de soporte TI mensual y cotizador de servicios: soporte, redes, CCTV, mantención y auditoría, con estimación transparente.";
+
+const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Precios" }];
+---
+<Base
+  title="Precios y cotizador de servicios TI | Tensor TI"
+  description={descripcion}
+  path="/precios"
+  jsonLd={[
+    breadcrumbLd(
+      [
+        { nombre: "Inicio", ruta: "/" },
+        { nombre: "Precios", ruta: "/precios" },
+      ],
+      Astro.site!,
+    ),
+  ]}
+>
+  <PageHero
+    etiqueta="Precios"
+    titulo="Planes y cotizador de servicios"
+    lead="Configura lo que necesitas y mira qué incluye, qué no y qué se cotiza aparte. Luego envías tu configuración como solicitud, sin volver a escribir nada."
+    migas={migas}
+  >
+    <div class="acciones">
+      <a class="btn btn-primario" href="#cotizador">Ir al cotizador</a>
+      <a class="btn btn-borde" href="#planes">Ver planes de soporte</a>
+    </div>
+  </PageHero>
+
+  <section id="planes" class="planes-sec">
+    <div class="wrap">
+      <p class="etiqueta">Soporte TI mensual</p>
+      <h2>Planes de soporte con cuota mensual</h2>
+      <PlanesSoporte />
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="etiqueta">Cotizador</p>
+      <h2>Configura tu servicio</h2>
+      <Cotizador />
+    </div>
+  </section>
+
+  <CtaBanda
+    titulo="¿Tu caso no encaja en ninguna opción?"
+    texto="Cuéntanos qué necesitas y armamos una propuesta a tu medida."
+  />
+</Base>
+
+<style>
+  .planes-sec { background: var(--papel-2); }
+</style>

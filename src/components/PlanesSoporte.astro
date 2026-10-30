@@ -1,0 +1,97 @@
+---
+// Planes de soporte TI mensual. Todo el contenido viene de src/data/planes.ts.
+import {
+  planes,
+  planesConfig,
+  etiquetasLimites,
+  adicionalesPlanes,
+  formatoUF,
+  type Limites,
+} from "../data/planes";
+import { contactoUrl } from "../lib/contacto";
+
+const limitesDefinidos = (l: Limites) =>
+  (Object.keys(l) as (keyof Limites)[]).filter((k) => l[k]).map((k) => [etiquetasLimites[k], l[k]] as const);
+---
+<div class="planes">
+  {planes.map((p) => {
+    const lims = limitesDefinidos(p.limites);
+    return (
+      <article class="plan">
+        <h3>{p.nombre}</h3>
+        <p class="precio">
+          {planesConfig.mostrarPrecios && p.desdeUF !== null
+            ? <><span class="desde">desde</span> <strong>{formatoUF(p.desdeUF)}</strong> {planesConfig.unidad}</>
+            : <strong>Cotiza tu plan</strong>}
+        </p>
+        <p class="resumen">{p.resumen}</p>
+        <ul class="incluye">
+          {p.incluye.map((i) => <li>{i}</li>)}
+        </ul>
+        {lims.length > 0 && (
+          <dl class="limites">
+            {lims.map(([k, v]) => (
+              <div><dt>{k}</dt><dd>{v}</dd></div>
+            ))}
+          </dl>
+        )}
+        <div class="acciones-plan">
+          <a class="btn btn-primario btn-sm" href={contactoUrl({ servicio: "soporte-ti", plan: p.id })}>
+            Cotizar plan {p.nombre}
+          </a>
+          <a class="enlace" href={`/precios?plan=${p.id}#cotizador`}>Configurar</a>
+        </div>
+      </article>
+    );
+  })}
+</div>
+
+<p class="nota">{planesConfig.notaPrecios}</p>
+
+<div class="aparte">
+  <h3>Se cotiza por separado</h3>
+  <ul>
+    {adicionalesPlanes.map((a) => <li>{a}</li>)}
+  </ul>
+</div>
+
+<style>
+  .planes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  .plan {
+    border: 1px solid var(--linea);
+    border-top: 4px solid var(--azul);
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+  }
+  h3 { font-size: 1.35rem; }
+  .precio { margin: 0.6rem 0 0.8rem; font-size: 1rem; color: var(--gris); }
+  .precio strong { font-size: 1.9rem; color: var(--tinta); letter-spacing: -0.02em; }
+  .desde { font-family: var(--mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .resumen { margin: 0 0 1rem; color: var(--gris); }
+  .incluye { list-style: none; padding: 0; margin: 0 0 1.2rem; display: grid; gap: 0.5rem; }
+  .incluye li { padding-left: 1.4rem; position: relative; }
+  .incluye li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 0.6rem;
+    height: 2px;
+    background: var(--terracota);
+  }
+  .limites { margin: 0 0 1.2rem; display: grid; gap: 0.4rem; font-size: 0.92rem; border-top: 1px solid var(--linea); padding-top: 1rem; }
+  .limites div { display: flex; justify-content: space-between; gap: 1rem; }
+  .limites dt { color: var(--gris); }
+  .limites dd { margin: 0; font-weight: 600; text-align: right; }
+  .acciones-plan { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+
+  .nota { margin: 1.6rem 0 0; color: var(--gris); font-size: 0.95rem; max-width: 46rem; }
+  .aparte { margin-top: 2rem; }
+  .aparte h3 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+  .aparte ul { margin: 0; padding-left: 1.2rem; color: var(--gris); display: grid; gap: 0.3rem; }
+
+  @media (max-width: 900px) { .planes { grid-template-columns: 1fr; } }
+</style>

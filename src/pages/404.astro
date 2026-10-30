@@ -1,0 +1,22 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+---
+<Base
+  title="Página no encontrada | Tensor TI"
+  description="La página que buscas no existe o cambió de dirección."
+  path="/404"
+  noindex
+>
+  <PageHero
+    etiqueta="Error 404"
+    titulo="No encontramos esta página"
+    lead="Puede que la dirección haya cambiado o que esté mal escrita. Estos enlaces te llevan a lo importante."
+  >
+    <div class="acciones">
+      <a class="btn btn-primario" href="/">Ir al inicio</a>
+      <a class="btn btn-borde" href="/servicios">Ver servicios</a>
+      <a class="btn btn-borde" href="/contacto">Contacto</a>
+    </div>
+  </PageHero>
+</Base>

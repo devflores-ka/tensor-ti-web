@@ -1,0 +1,71 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import FormularioContacto from "../components/FormularioContacto.astro";
+import { site } from "../data/site";
+import { whatsappUrl } from "../lib/contacto";
+import { breadcrumbLd } from "../lib/seo";
+
+const wa = whatsappUrl();
+const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Contacto" }];
+---
+<Base
+  title="Contacto y cotizaciones | Tensor TI"
+  description="Solicita una cotización o escríbenos: soporte TI, redes, mantención de equipos y más para empresas e instituciones en Pozo Almonte y la Región de Tarapacá."
+  path="/contacto"
+  jsonLd={[
+    breadcrumbLd(
+      [
+        { nombre: "Inicio", ruta: "/" },
+        { nombre: "Contacto", ruta: "/contacto" },
+      ],
+      Astro.site!,
+    ),
+  ]}
+>
+  <PageHero
+    etiqueta="Contacto"
+    titulo="Solicita tu cotización"
+    lead="Cuéntanos qué necesitas. Con eso preparamos una propuesta con alcance, plazos y valores."
+    migas={migas}
+  />
+
+  <section>
+    <div class="wrap layout">
+      <div>
+        <h2 class="solo-lectores">Formulario</h2>
+        <FormularioContacto />
+      </div>
+
+      <aside aria-labelledby="directo-t">
+        <h2 id="directo-t">También puedes escribirnos</h2>
+        <dl>
+          <div><dt>Correo</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+          <div><dt>Teléfono</dt><dd><a href={`tel:${site.telefonoLink}`}>{site.telefono}</a></dd></div>
+          {wa && <div><dt>WhatsApp</dt><dd><a href={wa}>Abrir conversación</a></dd></div>}
+          <div><dt>Ubicación</dt><dd>{site.ubicacion}</dd></div>
+        </dl>
+        <p class="nota">
+          Atendemos en la Región de Tarapacá, incluida Iquique. Si tu proyecto está en otra zona,
+          cuéntanos y lo evaluamos.
+        </p>
+        <p class="nota">
+          ¿Tienes planos, listados de equipos u otra documentación? Cuéntanos en el formulario y
+          envíala por correo una vez que te respondamos.
+        </p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 4rem; align-items: start; }
+  aside h2 { font-size: 1.5rem; margin: 0 0 1.4rem; }
+  dl { display: grid; gap: 1.1rem; margin: 0 0 1.6rem; }
+  dt { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terracota-texto); }
+  dd { margin: 0.2rem 0 0; font-size: 1.1rem; }
+  dd a { color: var(--tinta); text-underline-offset: 0.2em; }
+  dd a:hover { color: var(--terracota-texto); }
+  .nota { color: var(--gris); font-size: 0.95rem; margin: 0 0 1rem; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 3rem; } }
+</style>

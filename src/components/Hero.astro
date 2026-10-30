@@ -1,10 +1,9 @@
 ---
 import { site } from "../data/site";
-const wa = site.whatsapp
-  ? `https://wa.me/${site.whatsapp}?text=${encodeURIComponent("Hola, quisiera cotizar un servicio con Tensor TI.")}`
-  : null;
+import { whatsappUrl, mailtoUrl } from "../lib/contacto";
+const wa = whatsappUrl();
 ---
-<section id="inicio" class="hero">
+<section id="inicio" class="hero oscuro">
   <!-- Textura de circuito. Más adelante, aquí puede ir la animación del header. -->
   <svg class="trazas" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <g fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5">
@@ -34,12 +33,12 @@ const wa = site.whatsapp
       <div class="acciones">
         {wa
           ? <a class="btn btn-primario" href={wa}>Escríbenos por WhatsApp</a>
-          : <a class="btn btn-primario" href={`mailto:${site.email}`}>Escríbenos</a>}
-        <a class="btn btn-borde" href="#servicios">Ver servicios</a>
+          : <a class="btn btn-primario" href={mailtoUrl()}>Escríbenos</a>}
+        <a class="btn btn-borde" href="/servicios">Ver servicios</a>
       </div>
     </div>
     <div class="logo-box">
-      <img src="/tensor-logo.svg" alt="Logo Tensor TI" width="150" />
+      <img src="/tensor-logo.svg" alt="Logo Tensor TI" width="150" height="158" />
     </div>
   </div>
 </section>
@@ -62,7 +61,6 @@ const wa = site.whatsapp
   }
   h1 { font-size: clamp(2.2rem, 5.2vw, 3.8rem); margin: 1rem 0 1.4rem; }
   .sub { font-size: 1.15rem; max-width: 34rem; color: rgba(255, 255, 255, 0.82); margin: 0 0 2rem; }
-  .acciones { display: flex; flex-wrap: wrap; gap: 0.9rem; }
   .logo-box {
     justify-self: center;
     background: #fff;
@@ -74,7 +72,7 @@ const wa = site.whatsapp
   @media (max-width: 800px) {
     .grid { grid-template-columns: 1fr; }
     .logo-box { justify-self: start; order: -1; padding: 1.2rem; }
-    .logo-box img { width: 90px; }
+    .logo-box img { width: 90px; height: auto; }
     .hero { padding-top: 7rem; }
   }
 </style>

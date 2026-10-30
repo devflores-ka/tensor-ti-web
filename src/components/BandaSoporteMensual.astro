@@ -1,0 +1,52 @@
+---
+// Banda del inicio que presenta el soporte TI mensual.
+import { planes, planesConfig, formatoUF } from "../data/planes";
+
+const minimo = planes
+  .map((p) => p.desdeUF)
+  .filter((n): n is number => n !== null)
+  .sort((a, b) => a - b)[0];
+---
+<section class="banda">
+  <div class="wrap grid">
+    <div>
+      <p class="etiqueta">Soporte TI mensual</p>
+      <h2>Un departamento de informática externo, con cuota mensual.</h2>
+      <p class="texto">
+        Asistencia remota y en terreno, mantención preventiva y seguimiento de incidencias,
+        para empresas que no necesitan un informático a tiempo completo.
+      </p>
+      <div class="acciones">
+        <a class="btn btn-primario" href="/servicios/soporte-ti">Ver cómo funciona</a>
+        <a class="btn btn-secundario" href="/precios">Planes y cotizador</a>
+      </div>
+    </div>
+    {planesConfig.mostrarPrecios && minimo !== undefined && (
+      <div class="precio" aria-label="Precio referencial">
+        <span class="desde">Planes desde</span>
+        <strong>{formatoUF(minimo)} <small>{planesConfig.unidad}</small></strong>
+        <span class="nota">Valor referencial. Los límites de cada plan se definen en la cotización.</span>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .banda { background: var(--papel-2); }
+  .grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 3rem; align-items: center; }
+  h2 { margin: 0.6rem 0 1rem; font-size: clamp(1.7rem, 3.6vw, 2.4rem); }
+  .texto { margin: 0 0 1.6rem; color: var(--gris); max-width: 38rem; }
+  .precio {
+    background: var(--azul);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 1.8rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .desde { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terracota-claro); }
+  strong { font-size: 3rem; letter-spacing: -0.03em; line-height: 1; }
+  small { font-size: 1rem; font-weight: 400; opacity: 0.85; }
+  .nota { font-size: 0.85rem; color: rgba(255, 255, 255, 0.75); }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; gap: 2rem; } }
+</style>

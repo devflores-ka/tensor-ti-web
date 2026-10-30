@@ -1,0 +1,54 @@
+---
+import Base from "../../layouts/Base.astro";
+import PageHero from "../../components/PageHero.astro";
+import ListaServicios from "../../components/ListaServicios.astro";
+import BandaSoporteMensual from "../../components/BandaSoporteMensual.astro";
+import Metodo from "../../components/Metodo.astro";
+import CtaBanda from "../../components/CtaBanda.astro";
+import { servicios, otrosServicios } from "../../data/servicios";
+import { breadcrumbLd } from "../../lib/seo";
+
+const origen = Astro.site!;
+const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Servicios" }];
+---
+<Base
+  title="Servicios informáticos en Tarapacá | Tensor TI"
+  description="Soporte TI, redes, auditoría, mantención y reparación de equipos, CCTV, desarrollo de software y venta de equipos para empresas e instituciones en Tarapacá."
+  path="/servicios"
+  jsonLd={[
+    breadcrumbLd(
+      [
+        { nombre: "Inicio", ruta: "/" },
+        { nombre: "Servicios", ruta: "/servicios" },
+      ],
+      origen,
+    ),
+  ]}
+>
+  <PageHero
+    etiqueta="Servicios"
+    titulo="Servicios informáticos para empresas e instituciones"
+    lead="Trabajamos desde Pozo Almonte con cobertura en la Región de Tarapacá. Cada servicio se cotiza según tu caso, sin paquetes genéricos."
+    migas={migas}
+  />
+
+  <section>
+    <div class="wrap">
+      <h2>Qué podemos hacer por ti</h2>
+      <ListaServicios items={servicios} />
+      {otrosServicios.length > 0 && (
+        <p class="otros">
+          También ofrecemos: {otrosServicios.join(", ")}. <a class="enlace" href="/contacto">Consúltanos</a>.
+        </p>
+      )}
+    </div>
+  </section>
+
+  <BandaSoporteMensual />
+  <Metodo />
+  <CtaBanda />
+</Base>
+
+<style>
+  .otros { margin: 1.6rem 0 0; color: var(--gris); }
+</style>

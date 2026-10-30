@@ -3,7 +3,12 @@
   --azul-osc: #131139;
   --terracota: #b55d44;
   --terracota-osc: #9a4a33;
+  /* Variantes de la terracota con contraste suficiente para texto pequeño:
+     la oscura sobre fondos claros, la clara sobre fondos azules. */
+  --terracota-texto: #9a4a33;
+  --terracota-claro: #d88466;
   --papel: #f6f4ef;
+  --papel-2: #ebe7dd;
   --tinta: #16153a;
   --gris: #5b5b73;
   --linea: #dcd8cf;
@@ -12,6 +17,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 
 body {
@@ -33,9 +39,10 @@ h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin: 0.6rem 0 2.5rem; }
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--terracota);
+  color: var(--terracota-texto);
   margin: 0;
 }
+.oscuro .etiqueta { color: var(--terracota-claro); }
 
 .btn {
   display: inline-block;
@@ -45,10 +52,57 @@ h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin: 0.6rem 0 2.5rem; }
   border-radius: 0.4rem;
   border: 2px solid transparent;
   transition: background 0.15s, border-color 0.15s;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.3;
 }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.95rem; }
 .btn-primario { background: var(--terracota); color: #fff; }
 .btn-primario:hover { background: var(--terracota-osc); }
 .btn-borde { border-color: rgba(255, 255, 255, 0.45); color: #fff; }
 .btn-borde:hover { background: rgba(255, 255, 255, 0.1); }
+/* Botón secundario para fondos claros */
+.btn-secundario { border-color: var(--azul); color: var(--azul); background: transparent; }
+.btn-secundario:hover { background: rgba(28, 26, 78, 0.07); }
+.btn[disabled] { opacity: 0.6; cursor: progress; }
+
+.acciones { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+
+/* Enlaces dentro de texto sobre fondo claro */
+.enlace {
+  color: var(--terracota-texto);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+.enlace:hover { color: var(--azul); }
 
 :focus-visible { outline: 3px solid var(--terracota); outline-offset: 3px; }
+.oscuro :focus-visible { outline-color: var(--terracota-claro); }
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  background: #fff;
+  color: var(--azul);
+  padding: 0.6rem 1rem;
+  border-radius: 0.4rem;
+  font-weight: 600;
+}
+.skip:focus { top: 1rem; }
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}

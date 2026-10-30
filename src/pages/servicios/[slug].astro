@@ -1,0 +1,172 @@
+---
+import type { GetStaticPaths } from "astro";
+import Base from "../../layouts/Base.astro";
+import PageHero from "../../components/PageHero.astro";
+import PlanesSoporte from "../../components/PlanesSoporte.astro";
+import CtaBanda from "../../components/CtaBanda.astro";
+import { servicios, getServicio, rutaServicio, type Servicio } from "../../data/servicios";
+import { contactoUrl, whatsappUrl } from "../../lib/contacto";
+import { breadcrumbLd, servicioLd } from "../../lib/seo";
+
+export const getStaticPaths = (() =>
+  servicios.map((servicio) => ({
+    params: { slug: servicio.slug },
+    props: { servicio },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  servicio: Servicio;
+}
+const { servicio } = Astro.props;
+const origen = Astro.site!;
+const ruta = rutaServicio(servicio.slug);
+const relacionados = servicio.relacionados
+  .map((slug) => getServicio(slug))
+  .filter((s): s is Servicio => Boolean(s));
+const tienePlanes = servicio.slug === "soporte-ti";
+const wa = whatsappUrl(`Hola, quisiera consultar por el servicio de ${servicio.nombre}.`);
+
+const migas = [
+  { nombre: "Inicio", href: "/" },
+  { nombre: "Servicios", href: "/servicios" },
+  { nombre: servicio.nombre },
+];
+---
+<Base
+  title={servicio.seo.title}
+  description={servicio.seo.description}
+  path={ruta}
+  jsonLd={[
+    servicioLd(
+      { nombre: servicio.nombre, descripcion: servicio.seo.description, ruta },
+      origen,
+    ),
+    breadcrumbLd(
+      [
+        { nombre: "Inicio", ruta: "/" },
+        { nombre: "Servicios", ruta: "/servicios" },
+        { nombre: servicio.nombre, ruta },
+      ],
+      origen,
+    ),
+  ]}
+>
+  <PageHero etiqueta="Servicio" titulo={servicio.nombre} lead={servicio.intro} migas={migas}>
+    <div class="acciones">
+      <a class="btn btn-primario" href={contactoUrl({ servicio: servicio.slug })}>Solicitar cotización</a>
+      {tienePlanes
+        ? <a class="btn btn-borde" href="#planes">Ver planes</a>
+        : wa && <a class="btn btn-borde" href={wa}>Consultar por WhatsApp</a>}
+    </div>
+  </PageHero>
+
+  <section>
+    <div class="wrap">
+      <p class="etiqueta">Alcance</p>
+      <h2>Qué incluye</h2>
+      <ul class="incluye">
+        {servicio.incluye.map((i) => (
+          <li>
+            <h3>{i.titulo}</h3>
+            <p>{i.texto}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {tienePlanes && (
+    <section id="planes" class="planes-sec">
+      <div class="wrap">
+        <p class="etiqueta">Planes mensuales</p>
+        <h2>Soporte con cuota mensual predecible</h2>
+        <PlanesSoporte />
+      </div>
+    </section>
+  )}
+
+  <section class="alcance">
+    <div class="wrap dos">
+      <div>
+        <h2>Para quién es</h2>
+        <ul>
+          {servicio.paraQuien.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h2>Fuera del alcance o por cotizar</h2>
+        <ul>
+          {servicio.aparte.map((t) => <li>{t}</li>)}
+        </ul>
+        <p class="cobertura">
+          Trabajamos desde Pozo Almonte y atendemos en la Región de Tarapacá, incluida Iquique.
+          Los traslados fuera de la cobertura acordada se cotizan por separado.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {relacionados.length > 0 && (
+    <section>
+      <div class="wrap">
+        <p class="etiqueta">Relacionados</p>
+        <h2>Otros servicios que pueden interesarte</h2>
+        <ul class="relacionados">
+          {relacionados.map((r) => (
+            <li>
+              <a href={rutaServicio(r.slug)}>{r.nombre}</a>
+              <p>{r.corto}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <CtaBanda
+    titulo={`¿Quieres cotizar ${servicio.nombre.toLowerCase()}?`}
+    servicio={servicio.slug}
+    mensaje={`Hola, quisiera cotizar el servicio de ${servicio.nombre}.`}
+  />
+</Base>
+
+<style>
+  .incluye {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 3rem;
+    border-top: 1px solid var(--linea);
+  }
+  .incluye li { padding: 1.6rem 0; border-bottom: 1px solid var(--linea); }
+  .incluye h3 { font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .incluye p { margin: 0; color: var(--gris); }
+
+  .planes-sec { background: var(--papel-2); }
+  .alcance { background: var(--papel-2); }
+  .planes-sec + .alcance { background: var(--papel); }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .alcance h2 { font-size: 1.6rem; margin-bottom: 1.2rem; }
+  .alcance ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.6rem; color: var(--gris); }
+  .cobertura { margin: 1.6rem 0 0; font-size: 0.95rem; color: var(--gris); }
+
+  .relacionados {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.4rem;
+  }
+  .relacionados li { border-top: 3px solid var(--azul); padding-top: 1rem; }
+  .relacionados a { font-weight: 700; font-size: 1.1rem; color: var(--tinta); text-underline-offset: 0.2em; }
+  .relacionados a:hover { color: var(--terracota-texto); }
+  .relacionados p { margin: 0.4rem 0 0; color: var(--gris); font-size: 0.95rem; }
+
+  @media (max-width: 800px) {
+    .incluye { grid-template-columns: 1fr; }
+    .dos { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>

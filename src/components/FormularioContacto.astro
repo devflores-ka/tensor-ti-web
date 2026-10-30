@@ -1,0 +1,353 @@
+---
+// Formulario de contacto y solicitud de cotización.
+//
+// Dos modos, según `site.formEndpoint` (src/data/site.ts):
+//  - Con endpoint: envía los datos con fetch (POST JSON), con estados de carga,
+//    confirmación y error.
+//  - Sin endpoint (estado actual): NO envía nada a un servidor. Valida los datos,
+//    arma el mensaje y lo abre en WhatsApp o en el correo del usuario.
+import { site } from "../data/site";
+import { servicios } from "../data/servicios";
+import { planes } from "../data/planes";
+
+const modoServidor = Boolean(site.formEndpoint);
+const hayWhatsapp = Boolean(site.whatsapp);
+
+const opcionesServicio = [
+  ...servicios.map((s) => ({ valor: s.slug, etiqueta: s.nombre })),
+  { valor: "otro", etiqueta: "Otro o no estoy seguro" },
+];
+const planesJson = JSON.stringify(Object.fromEntries(planes.map((p) => [p.id, p.nombre])));
+const serviciosJson = JSON.stringify(Object.fromEntries(opcionesServicio.map((o) => [o.valor, o.etiqueta])));
+---
+<form
+  id="form-contacto"
+  class="form"
+  novalidate
+  data-modo={modoServidor ? "servidor" : "directo"}
+  data-endpoint={site.formEndpoint}
+  data-whatsapp={site.whatsapp}
+  data-email={site.email}
+  data-planes={planesJson}
+  data-servicios={serviciosJson}
+>
+  <div id="resumen-cotizacion" class="resumen" hidden>
+    <h3>Resumen de tu cotización</h3>
+    <pre id="resumen-texto"></pre>
+    <p>Este detalle se enviará junto con tu solicitud.</p>
+  </div>
+
+  <div class="fila">
+    <div class="campo">
+      <label for="nombre">Nombre <span class="req" aria-hidden="true">*</span></label>
+      <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre" />
+      <p class="error" id="error-nombre" hidden></p>
+    </div>
+    <div class="campo">
+      <label for="empresa">Empresa o institución</label>
+      <input id="empresa" name="empresa" type="text" autocomplete="organization" />
+    </div>
+  </div>
+
+  <div class="fila">
+    <div class="campo">
+      <label for="email">Correo <span class="req" aria-hidden="true">*</span></label>
+      <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="error-email" />
+      <p class="error" id="error-email" hidden></p>
+    </div>
+    <div class="campo">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" name="telefono" type="tel" autocomplete="tel" aria-describedby="error-telefono" />
+      <p class="error" id="error-telefono" hidden></p>
+    </div>
+  </div>
+
+  <div class="fila">
+    <div class="campo">
+      <label for="servicio">Servicio de interés</label>
+      <select id="servicio" name="servicio">
+        <option value="">Selecciona una opción</option>
+        {opcionesServicio.map((o) => <option value={o.valor}>{o.etiqueta}</option>)}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="ubicacion">Ubicación del proyecto</label>
+      <input id="ubicacion" name="ubicacion" type="text" placeholder="Comuna o ciudad" />
+    </div>
+  </div>
+
+  <div class="campo">
+    <label for="mensaje">Cuéntanos qué necesitas <span class="req" aria-hidden="true">*</span></label>
+    <textarea id="mensaje" name="mensaje" rows="5" required aria-describedby="error-mensaje"></textarea>
+    <p class="error" id="error-mensaje" hidden></p>
+  </div>
+
+  <div class="campo">
+    <label for="presupuesto">Presupuesto estimado</label>
+    <input id="presupuesto" name="presupuesto" type="text" aria-describedby="ayuda-presupuesto" />
+    <p class="ayuda" id="ayuda-presupuesto">Opcional. Un rango aproximado, en pesos o UF, si ya lo tienes definido.</p>
+  </div>
+
+  <!-- Campo trampa para bots: las personas no lo ven ni lo completan. -->
+  <div class="trampa" aria-hidden="true">
+    <label for="sitio_web">No completar este campo</label>
+    <input id="sitio_web" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div id="estado" class="estado" role="status" aria-live="polite" tabindex="-1" hidden></div>
+
+  <div class="acciones">
+    {modoServidor ? (
+      <button class="btn btn-primario" type="submit" value="servidor">Enviar solicitud</button>
+    ) : hayWhatsapp ? (
+      <>
+        <button class="btn btn-primario" type="submit" value="whatsapp">Enviar por WhatsApp</button>
+        <button class="btn btn-secundario" type="submit" value="correo">Enviar por correo</button>
+      </>
+    ) : (
+      <button class="btn btn-primario" type="submit" value="correo">Enviar por correo</button>
+    )}
+  </div>
+
+  <p class="privacidad">
+    {modoServidor
+      ? "Usaremos estos datos solo para responder tu solicitud."
+      : "Al enviar, se abrirá WhatsApp o tu programa de correo con el mensaje listo para que lo envíes tú. Usaremos estos datos solo para responder tu solicitud."}
+  </p>
+</form>
+
+<style>
+  .form { display: grid; gap: 1.2rem; }
+  .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .campo { display: grid; gap: 0.35rem; align-content: start; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .req { color: var(--terracota-texto); }
+  input, select, textarea {
+    font: inherit;
+    color: var(--tinta);
+    background: #fff;
+    border: 1.5px solid #b9b4a8;
+    border-radius: 0.4rem;
+    padding: 0.7rem 0.8rem;
+    width: 100%;
+  }
+  textarea { resize: vertical; min-height: 8rem; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--terracota); outline-offset: 1px; }
+  input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #b3261e; }
+  .error { margin: 0; color: #b3261e; font-size: 0.9rem; }
+  .ayuda { margin: 0; color: var(--gris); font-size: 0.88rem; }
+  .trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .resumen { background: #fff; border: 1px solid var(--linea); border-left: 4px solid var(--terracota); border-radius: 0.4rem; padding: 1rem 1.2rem; }
+  .resumen h3 { font-size: 1.05rem; margin-bottom: 0.6rem; }
+  .resumen pre { margin: 0 0 0.6rem; white-space: pre-wrap; font: inherit; font-size: 0.95rem; color: var(--tinta); }
+  .resumen p { margin: 0; font-size: 0.88rem; color: var(--gris); }
+
+  .estado { padding: 1rem 1.2rem; border-radius: 0.4rem; border: 1px solid var(--linea); background: #fff; }
+  .estado[data-tipo="exito"] { border-color: #2e7d32; background: #eef7ee; }
+  .estado[data-tipo="error"] { border-color: #b3261e; background: #fcefee; }
+  .estado :global(a) { color: var(--terracota-texto); font-weight: 600; }
+  .privacidad { margin: 0; font-size: 0.88rem; color: var(--gris); }
+
+  @media (max-width: 640px) { .fila { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  const form = document.getElementById("form-contacto") as HTMLFormElement | null;
+
+  if (form) {
+    const d = form.dataset;
+    const modo = d.modo;
+    const endpoint = d.endpoint ?? "";
+    const whatsapp = d.whatsapp ?? "";
+    const correo = d.email ?? "";
+    const planes: Record<string, string> = JSON.parse(d.planes ?? "{}");
+    const servicios: Record<string, string> = JSON.parse(d.servicios ?? "{}");
+
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const estado = $("estado");
+    const resumenCaja = $("resumen-cotizacion");
+    const resumenTexto = $("resumen-texto");
+
+    // --- Datos que llegan desde otras páginas (cotizador, planes, servicios) ---
+    const params = new URLSearchParams(location.search);
+    const servicioParam = params.get("servicio");
+    if (servicioParam && servicios[servicioParam]) {
+      ($("servicio") as HTMLSelectElement).value = servicioParam;
+    }
+    const lineasResumen: string[] = [];
+    const planParam = params.get("plan");
+    if (planParam && planes[planParam]) lineasResumen.push(`Plan de interés: ${planes[planParam]}`);
+    const detalleParam = params.get("detalle");
+    if (detalleParam) lineasResumen.push(...detalleParam.slice(0, 2000).split("\n"));
+    const resumen = lineasResumen.join("\n");
+    if (resumen) {
+      resumenTexto.textContent = resumen;
+      resumenCaja.hidden = false;
+    }
+
+    // --- Validación ---
+    type Regla = { id: string; mensaje: (v: string) => string | null };
+    const reglas: Regla[] = [
+      { id: "nombre", mensaje: (v) => (v ? null : "Escribe tu nombre.") },
+      {
+        id: "email",
+        mensaje: (v) =>
+          !v ? "Escribe tu correo." : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Revisa el correo: parece incompleto.",
+      },
+      {
+        id: "telefono",
+        mensaje: (v) => {
+          if (!v) return null;
+          const digitos = v.replace(/\D/g, "").length;
+          return digitos >= 8 && digitos <= 15 ? null : "Revisa el teléfono: debe tener entre 8 y 15 dígitos.";
+        },
+      },
+      {
+        id: "mensaje",
+        mensaje: (v) =>
+          !v ? "Cuéntanos qué necesitas." : v.length < 10 ? "Agrega un poco más de detalle (mínimo 10 caracteres)." : null,
+      },
+    ];
+
+    const valor = (id: string) => ($(id) as HTMLInputElement).value.trim();
+
+    function mostrarError(id: string, texto: string | null) {
+      const campo = $(id) as HTMLInputElement;
+      const caja = $(`error-${id}`);
+      if (texto) {
+        caja.textContent = texto;
+        caja.hidden = false;
+        campo.setAttribute("aria-invalid", "true");
+      } else {
+        caja.hidden = true;
+        campo.removeAttribute("aria-invalid");
+      }
+    }
+
+    function validar(): boolean {
+      let primero: HTMLElement | null = null;
+      for (const r of reglas) {
+        const msg = r.mensaje(valor(r.id));
+        mostrarError(r.id, msg);
+        if (msg && !primero) primero = $(r.id);
+      }
+      if (primero) {
+        primero.focus();
+        return false;
+      }
+      return true;
+    }
+
+    form.addEventListener("input", (e) => {
+      const id = (e.target as HTMLElement).id;
+      if (reglas.some((r) => r.id === id)) mostrarError(id, null);
+    });
+
+    // --- Estados ---
+    function setEstado(tipo: "info" | "exito" | "error", html: string) {
+      estado.dataset.tipo = tipo;
+      estado.innerHTML = html;
+      estado.hidden = false;
+      estado.focus();
+    }
+    const enlacesAlternativos = () =>
+      `${whatsapp ? `<a href="https://wa.me/${whatsapp}">WhatsApp</a> o ` : ""}<a href="mailto:${correo}">${correo}</a>`;
+
+    // --- Mensaje ---
+    function armarMensaje(): string {
+      const serv = valor("servicio");
+      const cabecera = [
+        `Hola, soy ${valor("nombre")}${valor("empresa") ? ` (${valor("empresa")})` : ""}.`,
+        serv && servicios[serv] ? `Servicio de interés: ${servicios[serv]}` : "",
+        valor("ubicacion") ? `Ubicación del proyecto: ${valor("ubicacion")}` : "",
+        valor("presupuesto") ? `Presupuesto estimado: ${valor("presupuesto")}` : "",
+      ].filter(Boolean);
+      const datosContacto = [
+        `Mi correo: ${valor("email")}`,
+        valor("telefono") ? `Mi teléfono: ${valor("telefono")}` : "",
+      ].filter(Boolean);
+      return [
+        cabecera.join("\n"),
+        valor("mensaje"),
+        resumen ? `Detalle de la cotización:\n${resumen}` : "",
+        datosContacto.join("\n"),
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      estado.hidden = true;
+      if (!validar()) {
+        setEstado("error", "Revisa los campos marcados antes de enviar.");
+        return;
+      }
+      // Campo trampa lleno: es un bot. No se envía nada.
+      if (valor("sitio_web")) return;
+
+      const canal = (e.submitter as HTMLButtonElement | null)?.value ?? "";
+      const texto = armarMensaje();
+
+      if (modo === "servidor") {
+        const botones = form.querySelectorAll<HTMLButtonElement>("button");
+        botones.forEach((b) => (b.disabled = true));
+        setEstado("info", "Enviando tu solicitud…");
+        const control = new AbortController();
+        const timeout = setTimeout(() => control.abort(), 15000);
+        try {
+          const resp = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({
+              nombre: valor("nombre"),
+              empresa: valor("empresa"),
+              email: valor("email"),
+              telefono: valor("telefono"),
+              servicio: valor("servicio"),
+              ubicacion: valor("ubicacion"),
+              presupuesto: valor("presupuesto"),
+              mensaje: valor("mensaje"),
+              detalle: resumen,
+              pagina: location.href,
+            }),
+            signal: control.signal,
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          setEstado(
+            "exito",
+            "<strong>Recibimos tu solicitud.</strong> Nos pondremos en contacto contigo al correo o teléfono que indicaste.",
+          );
+          form.reset();
+          resumenCaja.hidden = true;
+        } catch {
+          setEstado(
+            "error",
+            `<strong>No pudimos enviar tu solicitud.</strong> Inténtalo de nuevo en unos minutos o escríbenos por ${enlacesAlternativos()}.`,
+          );
+        } finally {
+          clearTimeout(timeout);
+          botones.forEach((b) => (b.disabled = false));
+        }
+        return;
+      }
+
+      // Modo sin servidor: se abre WhatsApp o el correo con el mensaje armado.
+      if (canal === "whatsapp" && whatsapp) {
+        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+        setEstado(
+          "info",
+          `Abrimos WhatsApp con tu mensaje listo. <strong>Para enviarlo, presiona enviar en WhatsApp.</strong> Si no se abrió, escríbenos por ${enlacesAlternativos()}.`,
+        );
+      } else {
+        const asunto = `Solicitud de cotización${servicios[valor("servicio")] ? `: ${servicios[valor("servicio")]}` : ""}`;
+        location.href = `mailto:${correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`;
+        setEstado(
+          "info",
+          `Abrimos tu programa de correo con el mensaje listo. <strong>Para enviarlo, presiona enviar allí.</strong> Si no se abrió, escribe a <a href="mailto:${correo}">${correo}</a>.`,
+        );
+      }
+    });
+  }
+</script>

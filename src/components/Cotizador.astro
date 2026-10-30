@@ -1,0 +1,308 @@
+---
+// Cotizador interactivo. Las preguntas y los precios vienen de src/data/cotizador.ts;
+// el cálculo, de src/lib/cotizador.ts. Este componente solo muestra la interfaz.
+import { categorias } from "../data/cotizador";
+import { planesConfig } from "../data/planes";
+import { site } from "../data/site";
+
+const datos = JSON.stringify({
+  categorias,
+  mostrarPrecios: planesConfig.mostrarPrecios,
+  unidad: planesConfig.unidad,
+  whatsapp: site.whatsapp,
+}).replace(/</g, "\\u003c");
+---
+<div id="cotizador" class="cotizador">
+  <fieldset class="selector">
+    <legend>¿Qué quieres cotizar?</legend>
+    <div class="chips">
+      {categorias.map((c, i) => (
+        <label class="chip">
+          <input type="radio" name="categoria" value={c.id} checked={i === 0} />
+          <span>{c.nombre}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="cuerpo">
+    <div class="preguntas">
+      {categorias.map((c, i) => (
+        <div class="cat" data-cat={c.id} hidden={i !== 0}>
+          <h3>{c.nombre}</h3>
+          <p class="desc">{c.descripcion}</p>
+
+          {c.preguntas.map((p) => {
+            const nombre = `${c.id}--${p.id}`;
+            return p.tipo === "numero" ? (
+              <div class="pregunta">
+                <label for={nombre}>{p.etiqueta}</label>
+                <input id={nombre} name={nombre} type="number" inputmode="numeric" min={p.min} max={p.max} step="1" />
+              </div>
+            ) : (
+              <fieldset class="pregunta">
+                <legend>{p.etiqueta}</legend>
+                {p.ayuda && <p class="ayuda">{p.ayuda}</p>}
+                <div class="opciones">
+                  {p.opciones.map((o, j) => (
+                    <label class="opcion">
+                      <input
+                        type={p.tipo === "opciones" ? "radio" : "checkbox"}
+                        name={nombre}
+                        value={o.valor}
+                        checked={p.tipo === "opciones" && j === 0 && p.id === "plan"}
+                      />
+                      <span>
+                        {o.etiqueta}
+                        {o.ayuda && <small>{o.ayuda}</small>}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+
+    <aside class="resultado" aria-labelledby="res-titulo">
+      <h3 id="res-titulo">Tu estimación</h3>
+
+      <div class="vivo" aria-live="polite" aria-atomic="true">
+        <p class="monto" id="res-monto"></p>
+        <p class="sub" id="res-sub"></p>
+      </div>
+
+      <ul class="lineas" id="res-lineas" hidden></ul>
+
+      <div id="res-cotizar" hidden>
+        <h4>Se cotiza según tu caso</h4>
+        <ul id="res-cotizar-lista"></ul>
+      </div>
+
+      {categorias.map((c, i) => (
+        <div class="info" data-info={c.id} hidden={i !== 0}>
+          <h4>Qué incluye</h4>
+          <ul>{c.incluye.map((t) => <li>{t}</li>)}</ul>
+          <h4>Límites y exclusiones</h4>
+          <ul>{c.exclusiones.map((t) => <li>{t}</li>)}</ul>
+        </div>
+      ))}
+
+      <p class="aviso">
+        Estimación referencial: no es una oferta ni un precio final. La cotización formal confirma
+        alcance, plazos y valores.
+      </p>
+
+      <div class="acciones">
+        <a class="btn btn-primario" id="res-solicitar" href="/contacto">Solicitar cotización formal</a>
+        {site.whatsapp && <a class="btn btn-secundario" id="res-wa" href="#">Enviar por WhatsApp</a>}
+      </div>
+    </aside>
+  </div>
+
+  <noscript>
+    <p class="sin-js">
+      El cotizador necesita JavaScript. Mientras tanto, puedes <a href="/contacto">solicitar una cotización</a>
+      indicando lo que necesitas.
+    </p>
+  </noscript>
+
+  <script type="application/json" id="cotizador-datos" is:inline set:html={datos} />
+</div>
+
+<style>
+  .selector { border: 0; padding: 0; margin: 0 0 2rem; min-width: 0; }
+  legend { font-weight: 700; padding: 0; margin-bottom: 0.8rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .chip span {
+    display: inline-block;
+    border: 1.5px solid #b9b4a8;
+    background: #fff;
+    padding: 0.55rem 1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .chip input:checked + span { background: var(--azul); border-color: var(--azul); color: #fff; }
+  .chip input:focus-visible + span { outline: 3px solid var(--terracota); outline-offset: 2px; }
+
+  .cuerpo { display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem; align-items: start; }
+
+  .cat h3 { font-size: 1.5rem; }
+  .desc { margin: 0.4rem 0 1.6rem; color: var(--gris); max-width: 38rem; }
+  .pregunta { border: 0; padding: 0; margin: 0 0 1.5rem; min-width: 0; display: grid; gap: 0.4rem; }
+  .pregunta > label, .pregunta > legend { font-weight: 600; font-size: 0.97rem; }
+  .ayuda { margin: 0; font-size: 0.88rem; color: var(--gris); }
+  input[type="number"] {
+    font: inherit;
+    width: 10rem;
+    padding: 0.6rem 0.75rem;
+    border: 1.5px solid #b9b4a8;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: var(--tinta);
+  }
+  input[type="number"]:focus-visible { outline: 3px solid var(--terracota); outline-offset: 1px; }
+  .opciones { display: grid; gap: 0.45rem; }
+  .opcion { display: flex; gap: 0.6rem; align-items: flex-start; cursor: pointer; }
+  .opcion input { margin-top: 0.3rem; accent-color: var(--azul); width: 1.05rem; height: 1.05rem; flex: none; }
+  .opcion small { display: block; color: var(--gris); font-size: 0.85rem; }
+
+  .resultado {
+    position: sticky;
+    top: 1.5rem;
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-top: 4px solid var(--azul);
+    border-radius: 0.5rem;
+    padding: 1.6rem;
+  }
+  .resultado h3 { font-size: 1.1rem; margin-bottom: 0.8rem; }
+  .monto { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+  .sub { margin: 0.4rem 0 1rem; color: var(--gris); font-size: 0.93rem; }
+  .resultado h4 { font-size: 0.8rem; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--terracota-texto); margin: 1.2rem 0 0.4rem; font-weight: 400; }
+  .resultado ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; font-size: 0.93rem; color: var(--gris); }
+  .lineas { list-style: none; padding: 0 !important; border-top: 1px solid var(--linea); }
+  .lineas :global(li) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid var(--linea); color: var(--tinta); }
+  .aviso { font-size: 0.85rem; color: var(--gris); margin: 1.2rem 0; }
+  .resultado .acciones { display: grid; gap: 0.6rem; }
+  .resultado .btn { text-align: center; }
+  .sin-js { color: var(--gris); }
+
+  @media (max-width: 900px) {
+    .cuerpo { grid-template-columns: 1fr; }
+    .resultado { position: static; }
+  }
+</style>
+
+<script>
+  import { calcular, type Seleccion } from "../lib/cotizador";
+  import { formatoUF } from "../lib/formato";
+  import type { Categoria } from "../data/cotizador";
+
+  const raiz = document.getElementById("cotizador");
+  const datosEl = document.getElementById("cotizador-datos");
+
+  if (raiz && datosEl) {
+    const datos = JSON.parse(datosEl.textContent ?? "{}") as {
+      categorias: Categoria[];
+      mostrarPrecios: boolean;
+      unidad: string;
+      whatsapp: string;
+    };
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    const monto = $("res-monto");
+    const sub = $("res-sub");
+    const lineasEl = $("res-lineas");
+    const cotizarCaja = $("res-cotizar");
+    const cotizarLista = $("res-cotizar-lista");
+    const solicitar = $<HTMLAnchorElement>("res-solicitar");
+    const wa = document.getElementById("res-wa") as HTMLAnchorElement | null;
+
+    const categoriaActual = (): Categoria => {
+      const marcada = raiz.querySelector<HTMLInputElement>('input[name="categoria"]:checked');
+      return datos.categorias.find((c) => c.id === marcada?.value) ?? datos.categorias[0];
+    };
+
+    function leerSeleccion(cat: Categoria): Seleccion {
+      const sel: Seleccion = {};
+      for (const p of cat.preguntas) {
+        const nombre = `${cat.id}--${p.id}`;
+        if (p.tipo === "opciones") {
+          sel[p.id] = raiz!.querySelector<HTMLInputElement>(`input[name="${nombre}"]:checked`)?.value;
+        } else if (p.tipo === "multiple") {
+          sel[p.id] = Array.from(
+            raiz!.querySelectorAll<HTMLInputElement>(`input[name="${nombre}"]:checked`),
+          ).map((i) => i.value);
+        } else {
+          const input = raiz!.querySelector<HTMLInputElement>(`input[name="${nombre}"]`);
+          sel[p.id] = input && input.value !== "" ? input.valueAsNumber : undefined;
+        }
+      }
+      return sel;
+    }
+
+    function li(texto: string, derecha?: string) {
+      const el = document.createElement("li");
+      const a = document.createElement("span");
+      a.textContent = texto;
+      el.append(a);
+      if (derecha) {
+        const b = document.createElement("span");
+        b.textContent = derecha;
+        el.append(b);
+      }
+      return el;
+    }
+
+    function render() {
+      const cat = categoriaActual();
+
+      raiz!.querySelectorAll<HTMLElement>("[data-cat]").forEach((el) => (el.hidden = el.dataset.cat !== cat.id));
+      raiz!.querySelectorAll<HTMLElement>("[data-info]").forEach((el) => (el.hidden = el.dataset.info !== cat.id));
+
+      const r = calcular(cat, leerSeleccion(cat), datos.mostrarPrecios);
+
+      if (cat.precio === "mensual" && r.totalUF !== null) {
+        monto.textContent = `Desde ${formatoUF(r.totalUF)} ${datos.unidad}`;
+        sub.textContent = "Estimación referencial a partir del plan elegido.";
+      } else if (cat.precio === "mensual") {
+        monto.textContent = "Cotiza tu plan";
+        sub.textContent = "Elige un plan y te preparamos una cotización.";
+      } else {
+        monto.textContent = "Cotización a medida";
+        sub.textContent = "El valor depende del levantamiento y se informa en tu cotización formal.";
+      }
+
+      lineasEl.replaceChildren(...r.lineas.map((l) => li(l.etiqueta, `${formatoUF(l.uf)} UF`)));
+      lineasEl.hidden = r.lineas.length === 0;
+
+      cotizarLista.replaceChildren(...r.porCotizar.map((t) => li(t)));
+      cotizarCaja.hidden = r.porCotizar.length === 0;
+
+      // Texto que viaja a la solicitud, para no volver a escribir nada.
+      const detalle = [
+        `Cotizador: ${cat.nombre}`,
+        ...r.resumen,
+        r.totalUF !== null ? `Estimación referencial: desde ${formatoUF(r.totalUF)} ${datos.unidad}` : "",
+        r.porCotizar.length ? `Se cotiza según el caso: ${r.porCotizar.join("; ")}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+        .slice(0, 1800);
+
+      solicitar.href = `/contacto?servicio=${encodeURIComponent(cat.servicio)}&detalle=${encodeURIComponent(detalle)}`;
+      if (wa && datos.whatsapp) {
+        wa.href = `https://wa.me/${datos.whatsapp}?text=${encodeURIComponent(
+          `Hola, quisiera cotizar con Tensor TI.\n\n${detalle}`,
+        )}`;
+      }
+    }
+
+    // Preselección desde otras páginas: /precios?plan=empresa  o  /precios?categoria=redes
+    const params = new URLSearchParams(location.search);
+    const categoriaParam = params.get("categoria");
+    if (categoriaParam) {
+      const radio = raiz.querySelector<HTMLInputElement>(`input[name="categoria"][value="${CSS.escape(categoriaParam)}"]`);
+      if (radio) radio.checked = true;
+    }
+    const planParam = params.get("plan");
+    if (planParam) {
+      const radio = raiz.querySelector<HTMLInputElement>(`input[name="soporte-ti--plan"][value="${CSS.escape(planParam)}"]`);
+      if (radio) {
+        radio.checked = true;
+        const cat = raiz.querySelector<HTMLInputElement>('input[name="categoria"][value="soporte-ti"]');
+        if (cat && !categoriaParam) cat.checked = true;
+      }
+    }
+
+    raiz.addEventListener("change", render);
+    raiz.addEventListener("input", render);
+    render();
+  }
+</script>

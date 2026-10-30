@@ -1,12 +1,99 @@
 ---
 import { site } from "../data/site";
+import { servicios, rutaServicio } from "../data/servicios";
+import { whatsappUrl } from "../lib/contacto";
+const wa = whatsappUrl();
 ---
-<footer>
-  <div class="wrap">
+<footer class="oscuro">
+  <div class="wrap cols">
+    <div>
+      <a href="/" class="marca" aria-label="Tensor TI, ir al inicio">
+        <span class="chip"><img src="/tensor-logo.svg" alt="" width="30" height="32" /></span>
+        <span>Tensor<span class="ti">TI</span></span>
+      </a>
+      <p class="desc">{site.descripcion}</p>
+    </div>
+
+    <nav aria-label="Servicios">
+      <h2 class="tit">Servicios</h2>
+      <ul>
+        {servicios.map((s) => (
+          <li><a href={rutaServicio(s.slug)}>{s.nombreCorto ?? s.nombre}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="tit">Contacto</h2>
+      <ul>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a href={`tel:${site.telefonoLink}`}>{site.telefono}</a></li>
+        {wa && <li><a href={wa}>WhatsApp</a></li>}
+        <li><a href="/precios">Precios y cotizador</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap legal">
     © {new Date().getFullYear()} {site.razonSocial} · RUT {site.rut} · {site.ubicacion}
   </div>
 </footer>
 
 <style>
-  footer { background: var(--azul-osc); color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; padding: 1.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+  footer {
+    background: var(--azul-osc);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.92rem;
+    padding: 2.5rem 0 0;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1.3fr 1.5fr 1fr;
+    gap: 2rem;
+    padding-bottom: 1.8rem;
+  }
+  .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0 0 0.8rem;
+  }
+  .marca .ti { color: var(--terracota-claro); margin-left: 0.3rem; }
+  .chip {
+    display: grid;
+    place-items: center;
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.4rem;
+  }
+  .chip img { display: block; height: 2rem; width: auto; }
+  .desc { margin: 0; max-width: 28rem; }
+  .tit {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--terracota-claro);
+    margin: 0 0 0.9rem;
+    font-weight: 400;
+  }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+  /* Servicios en dos columnas para que el footer no quede tan largo. */
+  nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 1.5rem; }
+  a { color: rgba(255, 255, 255, 0.85); }
+  a:hover { color: #fff; }
+  .legal {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-block: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  @media (max-width: 800px) {
+    .cols { grid-template-columns: 1fr; gap: 1.6rem; }
+    nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
 </style>
