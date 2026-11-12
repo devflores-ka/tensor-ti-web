@@ -4,10 +4,11 @@ type Ld = Record<string, unknown>;
 
 export const idOrganizacion = (origen: URL) => new URL("/#organizacion", origen).href;
 
+// En terreno: la región y sus comunas. A distancia (desarrollo, hosting): todo Chile.
 const zonas = [
-  { "@type": "AdministrativeArea", name: "Región de Tarapacá" },
-  { "@type": "City", name: "Pozo Almonte" },
-  { "@type": "City", name: "Iquique" },
+  { "@type": "AdministrativeArea", name: site.cobertura.region },
+  ...site.cobertura.comunas.map((name) => ({ "@type": "City", name })),
+  { "@type": "Country", name: "Chile" },
 ];
 
 /**
@@ -33,6 +34,14 @@ export function organizacionLd(origen: URL): Ld {
       addressCountry: "CL",
     },
     areaServed: zonas,
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: site.horario.dias,
+        opens: site.horario.abre,
+        closes: site.horario.cierra,
+      },
+    ],
   };
 }
 

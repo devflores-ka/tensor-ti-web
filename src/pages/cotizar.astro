@@ -1,0 +1,81 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import FormularioCotizar from "../components/FormularioCotizar.astro";
+import { site } from "../data/site";
+import { whatsappUrl } from "../lib/contacto";
+import { breadcrumbLd } from "../lib/seo";
+
+const wa = whatsappUrl();
+const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Cotizar" }];
+const pasos = [
+  "Revisamos tu requerimiento y, si hace falta, te llamamos para aclarar el alcance.",
+  "Te enviamos una cotización formal en PDF, con detalle, plazos y valores.",
+  "Si es una compra por Mercado Público, cotizamos directamente en la plataforma.",
+];
+---
+<Base
+  title="Cotizar servicios TI en Iquique y Tarapacá | Tensor TI"
+  description="Solicita una cotización de soporte TI, redes, desarrollo de software u hosting. Empresas y organismos públicos de Iquique, Alto Hospicio, Pozo Almonte y Chile."
+  path="/cotizar"
+  jsonLd={[
+    breadcrumbLd(
+      [
+        { nombre: "Inicio", ruta: "/" },
+        { nombre: "Cotizar", ruta: "/cotizar" },
+      ],
+      Astro.site!,
+    ),
+  ]}
+>
+  <PageHero
+    etiqueta="Cotizar"
+    titulo="Solicita una cotización"
+    lead="Cuéntanos qué necesitas. Con esos datos preparamos una cotización formal con alcance, plazos y valores."
+    migas={migas}
+  />
+
+  <section>
+    <div class="wrap layout">
+      <div>
+        <h2 class="solo-lectores">Formulario de cotización</h2>
+        <FormularioCotizar />
+      </div>
+
+      <aside aria-labelledby="despues-t">
+        <h2 id="despues-t">Qué pasa después</h2>
+        <ol class="pasos">
+          {pasos.map((p) => <li>{p}</li>)}
+        </ol>
+
+        <h2 class="sub">¿Prefieres escribirnos?</h2>
+        <dl>
+          <div><dt>Correo</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+          <div><dt>Teléfono</dt><dd><a href={`tel:${site.telefonoLink}`}>{site.telefono}</a></dd></div>
+          {wa && <div><dt>WhatsApp</dt><dd><a href={wa}>Abrir conversación</a></dd></div>}
+          <div><dt>Horario</dt><dd>{site.horario.texto}</dd></div>
+        </dl>
+        <p class="nota">{site.cobertura.terreno} {site.cobertura.remoto}</p>
+        <p class="nota">
+          Organismos públicos: también pueden invitarnos a cotizar en Mercado Público con el RUT
+          {" "}{site.rut} ({site.razonSocial}).
+        </p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout { display: grid; grid-template-columns: 1.7fr 1fr; gap: 4rem; align-items: start; }
+  aside h2 { font-size: 1.5rem; margin: 0 0 1.2rem; }
+  aside h2.sub { font-size: 1.2rem; margin-top: 2.2rem; }
+  .pasos { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.7rem; color: var(--gris); }
+  .pasos li::marker { color: var(--terracota-texto); font-family: var(--mono); }
+  dl { display: grid; gap: 1rem; margin: 0 0 1.4rem; }
+  dt { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terracota-texto); }
+  dd { margin: 0.2rem 0 0; font-size: 1.05rem; }
+  dd a { color: var(--tinta); text-underline-offset: 0.2em; }
+  dd a:hover { color: var(--terracota-texto); }
+  .nota { color: var(--gris); font-size: 0.95rem; margin: 0 0 1rem; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 3rem; } }
+</style>

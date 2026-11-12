@@ -10,8 +10,8 @@ const wa = whatsappUrl();
 const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Contacto" }];
 ---
 <Base
-  title="Contacto y cotizaciones | Tensor TI"
-  description="Solicita una cotización o escríbenos: soporte TI, redes, mantención de equipos y más para empresas e instituciones en Pozo Almonte y la Región de Tarapacá."
+  title="Contacto | Tensor TI, soporte TI en Iquique y Tarapacá"
+  description="Escríbenos o llámanos: soporte TI, redes, desarrollo y hosting para empresas e instituciones de Iquique, Alto Hospicio, Pozo Almonte y toda Tarapacá."
   path="/contacto"
   jsonLd={[
     breadcrumbLd(
@@ -44,11 +44,11 @@ const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Contacto" }];
           <div><dt>Teléfono</dt><dd><a href={`tel:${site.telefonoLink}`}>{site.telefono}</a></dd></div>
           {wa && <div><dt>WhatsApp</dt><dd><a href={wa}>Abrir conversación</a></dd></div>}
           <div><dt>Ubicación</dt><dd>{site.ubicacion}</dd></div>
+          <div><dt>Horario</dt><dd>{site.horario.texto}</dd></div>
         </dl>
-        <p class="nota">
-          Atendemos en la Región de Tarapacá, incluida Iquique. Si tu proyecto está en otra zona,
-          cuéntanos y lo evaluamos.
-        </p>
+        <h3 class="cob-t">Cobertura</h3>
+        <p class="nota">{site.cobertura.terreno}</p>
+        <p class="nota">{site.cobertura.remoto}</p>
         <p class="nota">
           ¿Tienes planos, listados de equipos u otra documentación? Cuéntanos en el formulario y
           envíala por correo una vez que te respondamos.
@@ -67,5 +67,6 @@ const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Contacto" }];
   dd a { color: var(--tinta); text-underline-offset: 0.2em; }
   dd a:hover { color: var(--terracota-texto); }
   .nota { color: var(--gris); font-size: 0.95rem; margin: 0 0 1rem; }
+  .cob-t { font-size: 1.1rem; margin: 0 0 0.6rem; }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 3rem; } }
 </style>

@@ -1,7 +1,8 @@
 ---
 // Sección de servicios del inicio: los principales numerados y el resto como etiquetas.
+// Los nombres son los mismos del footer (nombreVisible).
 import ListaServicios from "./ListaServicios.astro";
-import { servicios, otrosServicios, rutaServicio } from "../data/servicios";
+import { servicios, rutaServicio, nombreVisible } from "../data/servicios";
 
 const principales = servicios.filter((s) => s.principal);
 const tambien = servicios.filter((s) => !s.principal);
@@ -11,14 +12,13 @@ const tambien = servicios.filter((s) => !s.principal);
     <p class="etiqueta">Servicios</p>
     <h2>Lo que hacemos</h2>
 
-    <ListaServicios items={principales} tituloHome />
+    <ListaServicios items={principales} nombreCorto />
 
     <p class="etiqueta tambien-t">También</p>
     <ul class="tambien">
       {tambien.map((s) => (
-        <li><a href={rutaServicio(s.slug)}>{s.nombre}</a></li>
+        <li><a href={rutaServicio(s.slug)}>{nombreVisible(s)}</a></li>
       ))}
-      {otrosServicios.map((t) => <li>{t}</li>)}
     </ul>
 
     <p class="todos"><a class="enlace" href="/servicios">Ver todos los servicios →</a></p>
@@ -30,13 +30,16 @@ const tambien = servicios.filter((s) => !s.principal);
   .tambien { display: flex; flex-wrap: wrap; gap: 0.6rem; list-style: none; padding: 0; margin: 0.8rem 0 0; }
   .tambien li {
     border: 1px solid var(--linea);
-    padding: 0.5rem 0.9rem;
     border-radius: 2rem;
     font-size: 0.95rem;
-    color: var(--gris);
   }
-  .tambien a { color: var(--tinta); text-decoration: none; }
-  .tambien li:has(a):hover { border-color: var(--terracota); }
+  .tambien a {
+    display: block;
+    padding: 0.5rem 0.9rem;
+    color: var(--tinta);
+    text-decoration: none;
+  }
+  .tambien li:hover { border-color: var(--terracota); }
   .tambien a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
   .todos { margin: 2rem 0 0; }
 </style>

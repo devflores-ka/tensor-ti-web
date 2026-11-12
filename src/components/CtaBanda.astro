@@ -1,6 +1,6 @@
 ---
 // Llamada a la acción reutilizable para el final de cada página.
-import { contactoUrl, whatsappUrl } from "../lib/contacto";
+import { cotizarUrl, whatsappUrl } from "../lib/contacto";
 
 interface Props {
   titulo?: string;
@@ -26,7 +26,7 @@ const wa = whatsappUrl(mensaje);
         <p>{texto}</p>
       </div>
       <div class="acciones">
-        <a class="btn btn-primario" href={contactoUrl({ servicio })}>Solicitar cotización</a>
+        <a class="btn btn-primario" href={cotizarUrl({ servicio })}>Solicitar cotización</a>
         {wa && <a class="btn btn-borde" href={wa}>Escribir por WhatsApp</a>}
       </div>
     </div>

@@ -1,0 +1,414 @@
+---
+// Formulario de solicitud de cotización (/cotizar).
+//
+// Envía a la Pages Function /api/cotizar (functions/api/cotizar.ts), que valida
+// de nuevo, verifica Turnstile y manda el pedido por correo. Las reglas de
+// validación están en src/lib/solicitud.ts y son las mismas en ambos lados.
+import { site } from "../data/site";
+import { planes } from "../data/planes";
+import {
+  ADJUNTO_EXTENSIONES,
+  ADJUNTO_MAX_TEXTO,
+  LARGO_MAX,
+  PLAZOS,
+  REGIONES,
+  opcionesServicio,
+} from "../lib/solicitud";
+
+// Clave pública de Turnstile: la de site.ts o, si está vacía, la variable de build
+// PUBLIC_TURNSTILE_SITE_KEY. En `astro dev` se usa la clave de prueba de Cloudflare
+// (siempre aprueba).
+const CLAVE_PRUEBA = "1x00000000000000000000AA";
+const claveTurnstile =
+  site.turnstileSiteKey ||
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ||
+  (import.meta.env.DEV ? CLAVE_PRUEBA : "");
+
+const planesJson = JSON.stringify(Object.fromEntries(planes.map((p) => [p.id, p.nombre])));
+const aceptar = ADJUNTO_EXTENSIONES.join(",");
+---
+<form
+  id="form-cotizar"
+  class="form"
+  method="post"
+  action="/api/cotizar"
+  enctype="multipart/form-data"
+  novalidate
+  data-planes={planesJson}
+  data-email={site.email}
+  data-whatsapp={site.whatsapp}
+>
+  <noscript>
+    <p class="estado" data-tipo="error">
+      Para enviar este formulario necesitas JavaScript activo. También puedes escribirnos a{" "}
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </noscript>
+
+  <div id="estado" class="estado" role="alert" tabindex="-1" hidden></div>
+
+  <fieldset>
+    <legend>Tus datos</legend>
+    <div class="fila">
+      <div class="campo">
+        <label for="nombre">Nombre <span class="req">(obligatorio)</span></label>
+        <input id="nombre" name="nombre" type="text" autocomplete="name" required
+          maxlength={LARGO_MAX.nombre} aria-describedby="error-nombre" />
+        <p class="error" id="error-nombre" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="organizacion">Empresa u organismo <span class="req">(obligatorio)</span></label>
+        <input id="organizacion" name="organizacion" type="text" autocomplete="organization" required
+          maxlength={LARGO_MAX.organizacion} aria-describedby="error-organizacion" />
+        <p class="error" id="error-organizacion" hidden></p>
+      </div>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="rut">RUT de la empresa u organismo <span class="opc">(opcional)</span></label>
+        <input id="rut" name="rut" type="text" inputmode="text" placeholder="76.123.456-7"
+          maxlength={LARGO_MAX.rut} aria-describedby="error-rut" />
+        <p class="error" id="error-rut" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="email">Correo <span class="req">(obligatorio)</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" required
+          maxlength={LARGO_MAX.email} aria-describedby="error-email" />
+        <p class="error" id="error-email" hidden></p>
+      </div>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="telefono">Teléfono <span class="req">(obligatorio)</span></label>
+        <input id="telefono" name="telefono" type="tel" autocomplete="tel" required
+          placeholder="+56 9 1234 5678" maxlength={LARGO_MAX.telefono} aria-describedby="error-telefono" />
+        <p class="error" id="error-telefono" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="region">Región <span class="req">(obligatorio)</span></label>
+        <select id="region" name="region" required aria-describedby="error-region">
+          {REGIONES.map((r) => <option value={r} selected={r === "Tarapacá"}>{r}</option>)}
+        </select>
+        <p class="error" id="error-region" hidden></p>
+      </div>
+    </div>
+
+    <div class="campo media">
+      <label for="comuna">Comuna <span class="req">(obligatorio)</span></label>
+      <input id="comuna" name="comuna" type="text" autocomplete="address-level2" required
+        list="comunas-tarapaca" maxlength={LARGO_MAX.comuna} aria-describedby="error-comuna" />
+      <datalist id="comunas-tarapaca">
+        <option value="Iquique"></option>
+        <option value="Alto Hospicio"></option>
+        <option value="Pozo Almonte"></option>
+        <option value="Pica"></option>
+        <option value="Huara"></option>
+        <option value="Camiña"></option>
+        <option value="Colchane"></option>
+      </datalist>
+      <p class="error" id="error-comuna" hidden></p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Tu requerimiento</legend>
+
+    <div id="resumen-cotizacion" class="resumen" hidden>
+      <h3>Datos que traes desde el sitio</h3>
+      <pre id="resumen-texto"></pre>
+      <p>Se agregarán a tu solicitud.</p>
+      <input type="hidden" name="resumen" id="resumen-campo" />
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="servicio">Tipo de servicio <span class="req">(obligatorio)</span></label>
+        <select id="servicio" name="servicio" required aria-describedby="error-servicio">
+          <option value="">Selecciona una opción</option>
+          {opcionesServicio.map((o) => <option value={o.valor}>{o.etiqueta}</option>)}
+        </select>
+        <p class="error" id="error-servicio" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="plazo">Plazo deseado <span class="req">(obligatorio)</span></label>
+        <select id="plazo" name="plazo" required aria-describedby="error-plazo">
+          <option value="">Selecciona una opción</option>
+          {PLAZOS.map((p) => <option value={p.valor}>{p.etiqueta}</option>)}
+        </select>
+        <p class="error" id="error-plazo" hidden></p>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="descripcion">Descripción del requerimiento <span class="req">(obligatorio)</span></label>
+      <textarea id="descripcion" name="descripcion" rows="7" required maxlength={LARGO_MAX.descripcion}
+        aria-describedby="ayuda-descripcion error-descripcion"></textarea>
+      <p class="ayuda" id="ayuda-descripcion">
+        Qué necesitas, cuántos equipos, usuarios o sitios involucra, y cualquier condición importante.
+      </p>
+      <p class="error" id="error-descripcion" hidden></p>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="mercadoPublicoId">ID de Mercado Público <span class="opc">(opcional)</span></label>
+        <input id="mercadoPublicoId" name="mercadoPublicoId" type="text" placeholder="1098710-227-COT26"
+          maxlength={LARGO_MAX.mercadoPublicoId} autocapitalize="characters"
+          aria-describedby="ayuda-mp error-mercadoPublicoId" />
+        <p class="ayuda" id="ayuda-mp">Si es una Compra Ágil o licitación ya publicada.</p>
+        <p class="error" id="error-mercadoPublicoId" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="adjunto">Adjunto <span class="opc">(opcional)</span></label>
+        <input id="adjunto" name="adjunto" type="file" accept={aceptar}
+          aria-describedby="ayuda-adjunto error-adjunto" />
+        <p class="ayuda" id="ayuda-adjunto">
+          Bases, términos de referencia, planos o listados. PDF, Word, Excel, imagen o ZIP, hasta {ADJUNTO_MAX_TEXTO}.
+        </p>
+        <p class="error" id="error-adjunto" hidden></p>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Campo trampa para bots: las personas no lo ven ni lo completan. -->
+  <div class="trampa" aria-hidden="true">
+    <label for="sitio_web">No completar este campo</label>
+    <input id="sitio_web" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  {claveTurnstile ? (
+    <div class="verificacion">
+      <div class="cf-turnstile" data-sitekey={claveTurnstile} data-language="es" data-theme="light"
+        data-response-field-name="cf-turnstile-response"></div>
+      <p class="error" id="error-turnstile" hidden></p>
+    </div>
+  ) : (
+    <p class="estado" data-tipo="error">
+      El formulario no está disponible en este momento. Escríbenos a{" "}
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  )}
+
+  <div class="acciones">
+    <button class="btn btn-primario" type="submit" id="enviar" disabled={!claveTurnstile}>
+      Enviar solicitud
+    </button>
+  </div>
+
+  <p class="privacidad">
+    Usaremos estos datos solo para preparar y enviarte la cotización. No los compartimos con terceros.
+  </p>
+</form>
+
+{claveTurnstile && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
+<style>
+  .form { display: grid; gap: 1.6rem; }
+  fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 1.2rem; min-width: 0; }
+  legend {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--terracota-texto);
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+  .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .campo { display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
+  .campo.media { max-width: calc(50% - 0.6rem); }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .req, .opc { font-weight: 400; font-size: 0.85rem; color: var(--gris); }
+  input, select, textarea {
+    font: inherit;
+    color: var(--tinta);
+    background: #fff;
+    border: 1.5px solid #8d887c;
+    border-radius: 0.4rem;
+    padding: 0.7rem 0.8rem;
+    width: 100%;
+  }
+  input[type="file"] { padding: 0.55rem 0.6rem; font-size: 0.92rem; }
+  textarea { resize: vertical; min-height: 9rem; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--terracota); outline-offset: 1px; }
+  [aria-invalid="true"] { border-color: #b3261e; }
+  .error { margin: 0; color: #b3261e; font-size: 0.9rem; }
+  .ayuda { margin: 0; color: var(--gris); font-size: 0.88rem; }
+  .trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .resumen { background: #fff; border: 1px solid var(--linea); border-left: 4px solid var(--terracota); border-radius: 0.4rem; padding: 1rem 1.2rem; }
+  .resumen h3 { font-size: 1.05rem; margin-bottom: 0.6rem; }
+  .resumen pre { margin: 0 0 0.6rem; white-space: pre-wrap; font: inherit; font-size: 0.95rem; color: var(--tinta); }
+  .resumen p { margin: 0; font-size: 0.88rem; color: var(--gris); }
+
+  .verificacion { display: grid; gap: 0.4rem; min-height: 65px; }
+
+  .estado { margin: 0; padding: 1rem 1.2rem; border-radius: 0.4rem; border: 1px solid var(--linea); background: #fff; }
+  .estado[data-tipo="error"] { border-color: #b3261e; background: #fcefee; }
+  .estado[data-tipo="info"] { border-color: var(--azul); background: #fff; }
+  .estado :global(a) { color: var(--terracota-texto); font-weight: 600; }
+  .estado :global(ul) { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+  .privacidad { margin: 0; font-size: 0.88rem; color: var(--gris); }
+
+  @media (max-width: 640px) {
+    .fila { grid-template-columns: 1fr; }
+    .campo.media { max-width: none; }
+  }
+</style>
+
+<script>
+  import { CAMPOS, errorAdjunto, leerCampos, validar } from "../lib/solicitud";
+
+  // Tipos mínimos del script de Turnstile (se carga aparte, desde Cloudflare).
+  declare global {
+    interface Window {
+      turnstile?: { reset: (widget?: string | HTMLElement) => void };
+    }
+  }
+
+  const form = document.getElementById("form-cotizar") as HTMLFormElement | null;
+
+  if (form) {
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const estado = $("estado");
+    const boton = $<HTMLButtonElement>("enviar");
+    const correo = form.dataset.email ?? "";
+    const whatsapp = form.dataset.whatsapp ?? "";
+    const planes: Record<string, string> = JSON.parse(form.dataset.planes ?? "{}");
+
+    const contactoDirecto =
+      `Puedes escribirnos a <a href="mailto:${correo}">${correo}</a>` +
+      (whatsapp ? ` o por <a href="https://wa.me/${whatsapp}">WhatsApp</a>.` : ".");
+
+    const MENSAJES: Record<string, string> = {
+      validacion: "Revisa los campos marcados.",
+      verificacion: "No pudimos verificar el envío. Recarga la página e inténtalo de nuevo.",
+      tamano: "El adjunto es demasiado grande.",
+      envio: "No pudimos enviar tu solicitud.",
+      configuracion: "El formulario no está disponible en este momento.",
+    };
+
+    // --- Datos que llegan desde otras páginas (servicios, planes, cotizador de /precios) ---
+    const params = new URLSearchParams(location.search);
+    const servicio = params.get("servicio");
+    const selServicio = $<HTMLSelectElement>("servicio");
+    if (servicio && [...selServicio.options].some((o) => o.value === servicio)) selServicio.value = servicio;
+
+    const resumen: string[] = [];
+    const plan = params.get("plan");
+    if (plan && planes[plan]) resumen.push(`Plan de interés: ${planes[plan]}`);
+    const detalle = params.get("detalle");
+    if (detalle) resumen.push(...detalle.slice(0, 2000).split("\n"));
+    if (resumen.length) {
+      $("resumen-texto").textContent = resumen.join("\n");
+      ($("resumen-campo") as HTMLInputElement).value = resumen.join("\n");
+      $("resumen-cotizacion").hidden = false;
+    }
+
+    // Error devuelto por el servidor cuando el envío no pasó por JavaScript.
+    const errorParam = params.get("error");
+    if (errorParam && MENSAJES[errorParam]) mostrarEstado(`${MENSAJES[errorParam]} ${contactoDirecto}`);
+
+    // --- Mensajes por campo ---
+    function marcar(id: string, mensaje: string | undefined) {
+      const campo = document.getElementById(id);
+      const error = document.getElementById(`error-${id}`);
+      if (!campo || !error) return;
+      if (mensaje) {
+        campo.setAttribute("aria-invalid", "true");
+        error.textContent = mensaje;
+        error.hidden = false;
+      } else {
+        campo.removeAttribute("aria-invalid");
+        error.textContent = "";
+        error.hidden = true;
+      }
+    }
+
+    function mostrarEstado(html: string) {
+      estado.dataset.tipo = "error";
+      estado.innerHTML = html;
+      estado.hidden = false;
+      estado.focus();
+    }
+
+    function erroresLocales(): Record<string, string> {
+      const fd = new FormData(form!);
+      const e = validar(leerCampos(fd)) as Record<string, string>;
+      const archivo = $<HTMLInputElement>("adjunto").files?.[0];
+      if (archivo) {
+        const err = errorAdjunto(archivo.name, archivo.size);
+        if (err) e.adjunto = err;
+      }
+      return e;
+    }
+
+    function aplicarErrores(e: Record<string, string>) {
+      for (const k of [...CAMPOS, "adjunto"]) marcar(k, e[k]);
+    }
+
+    // Revalida un campo al salir de él, solo si ya estaba marcado con error.
+    form.addEventListener("focusout", (ev) => {
+      const id = (ev.target as HTMLElement).id;
+      if (!id || document.getElementById(id)?.getAttribute("aria-invalid") !== "true") return;
+      marcar(id, erroresLocales()[id]);
+    });
+    $<HTMLInputElement>("adjunto").addEventListener("change", () => marcar("adjunto", erroresLocales().adjunto));
+
+    // --- Envío ---
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      estado.hidden = true;
+
+      const errores = erroresLocales();
+      aplicarErrores(errores);
+      const primero = [...CAMPOS, "adjunto"].find((k) => errores[k]);
+      if (primero) {
+        document.getElementById(primero)?.focus();
+        return;
+      }
+
+      const fd = new FormData(form);
+      const token = fd.get("cf-turnstile-response");
+      const errorTurnstile = document.getElementById("error-turnstile");
+      if (!token) {
+        if (errorTurnstile) {
+          errorTurnstile.textContent = "Completa la verificación antes de enviar.";
+          errorTurnstile.hidden = false;
+        }
+        return;
+      }
+      if (errorTurnstile) errorTurnstile.hidden = true;
+
+      boton.disabled = true;
+      boton.textContent = "Enviando…";
+      try {
+        const r = await fetch(form.action, { method: "POST", body: fd, headers: { Accept: "application/json" } });
+        const datos = await r.json().catch(() => null);
+        if (r.ok && datos?.ok) {
+          location.href = `/cotizar/enviado?folio=${encodeURIComponent(datos.folio)}`;
+          return;
+        }
+        if (datos?.errores && Object.keys(datos.errores).length) {
+          aplicarErrores(datos.errores);
+          const lista = Object.values(datos.errores as Record<string, string>).map((m) => `<li>${m}</li>`).join("");
+          mostrarEstado(`${MENSAJES.validacion}<ul>${lista}</ul>`);
+        } else {
+          const msg = (datos?.codigo && MENSAJES[datos.codigo]) || MENSAJES.envio;
+          mostrarEstado(`${msg} ${contactoDirecto}`);
+        }
+      } catch {
+        mostrarEstado(`No hay conexión o el servidor no respondió. ${contactoDirecto}`);
+      } finally {
+        // El token de Turnstile sirve una sola vez: se renueva para el siguiente intento.
+        window.turnstile?.reset();
+        boton.disabled = false;
+        boton.textContent = "Enviar solicitud";
+      }
+    });
+  }
+</script>

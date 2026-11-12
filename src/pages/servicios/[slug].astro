@@ -5,7 +5,7 @@ import PageHero from "../../components/PageHero.astro";
 import PlanesSoporte from "../../components/PlanesSoporte.astro";
 import CtaBanda from "../../components/CtaBanda.astro";
 import { servicios, getServicio, rutaServicio, type Servicio } from "../../data/servicios";
-import { contactoUrl, whatsappUrl } from "../../lib/contacto";
+import { cotizarUrl, whatsappUrl } from "../../lib/contacto";
 import { breadcrumbLd, servicioLd } from "../../lib/seo";
 
 export const getStaticPaths = (() =>
@@ -53,7 +53,7 @@ const migas = [
 >
   <PageHero etiqueta="Servicio" titulo={servicio.nombre} lead={servicio.intro} migas={migas}>
     <div class="acciones">
-      <a class="btn btn-primario" href={contactoUrl({ servicio: servicio.slug })}>Solicitar cotización</a>
+      <a class="btn btn-primario" href={cotizarUrl({ servicio: servicio.slug })}>Solicitar cotización</a>
       {tienePlanes
         ? <a class="btn btn-borde" href="#planes">Ver planes</a>
         : wa && <a class="btn btn-borde" href={wa}>Consultar por WhatsApp</a>}
@@ -99,8 +99,9 @@ const migas = [
           {servicio.aparte.map((t) => <li>{t}</li>)}
         </ul>
         <p class="cobertura">
-          Trabajamos desde Pozo Almonte y atendemos en la Región de Tarapacá, incluida Iquique.
-          Los traslados fuera de la cobertura acordada se cotizan por separado.
+          {servicio.remoto
+            ? "Trabajamos desde Pozo Almonte y prestamos este servicio a distancia en todo Chile. En la Región de Tarapacá también podemos reunirnos en persona."
+            : "Trabajamos desde Pozo Almonte y atendemos en terreno en la Región de Tarapacá, incluidas Iquique y Alto Hospicio. Los traslados fuera de la cobertura acordada se cotizan por separado."}
         </p>
       </div>
     </div>

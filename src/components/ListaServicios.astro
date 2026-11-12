@@ -1,21 +1,21 @@
 ---
 // Lista numerada de servicios, con enlace a la página de cada uno.
 import type { Servicio } from "../data/servicios";
-import { rutaServicio } from "../data/servicios";
+import { rutaServicio, nombreVisible } from "../data/servicios";
 
 interface Props {
   items: Servicio[];
-  /** Usa el título abreviado del home cuando existe. */
-  tituloHome?: boolean;
+  /** Usa el nombre corto (el mismo del footer) en vez del nombre completo. */
+  nombreCorto?: boolean;
 }
-const { items, tituloHome = false } = Astro.props;
+const { items, nombreCorto = false } = Astro.props;
 ---
 <ol class="lista">
   {items.map((s, i) => (
     <li>
       <span class="num">{String(i + 1).padStart(2, "0")}</span>
       <div>
-        <h3><a href={rutaServicio(s.slug)}>{tituloHome ? (s.homeTitulo ?? s.nombre) : s.nombre}</a></h3>
+        <h3><a href={rutaServicio(s.slug)}>{nombreCorto ? nombreVisible(s) : s.nombre}</a></h3>
         <p>{s.corto}</p>
       </div>
     </li>

@@ -1,0 +1,95 @@
+---
+// Sección "Proyectos": una tarjeta por cada proyecto de src/data/proyectos.ts.
+import { proyectos } from "../data/proyectos";
+import { getServicio, rutaServicio } from "../data/servicios";
+---
+{proyectos.length > 0 && (
+  <section id="proyectos" class="proyectos">
+    <div class="wrap">
+      <p class="etiqueta">Proyectos</p>
+      <h2>Trabajos realizados</h2>
+
+      <ul class="tarjetas">
+        {proyectos.map((p) => {
+          const servicio = p.servicio ? getServicio(p.servicio) : undefined;
+          return (
+            <li class="tarjeta">
+              <p class="tipo">{p.tipo}</p>
+              <h3>{p.nombre}</h3>
+              {p.cliente && <p class="cliente">Cliente: {p.cliente}</p>}
+              <p class="desc">{p.descripcion}</p>
+
+              <p class="plat-t">Disponible en</p>
+              <ul class="plataformas">
+                {p.plataformas.map((pl) => <li>{pl}</li>)}
+              </ul>
+
+              {(p.enlaces.length > 0 || servicio) && (
+                <p class="enlaces">
+                  {p.enlaces.map((e) => (
+                    <a class="enlace" href={e.url} rel="noopener" target="_blank">
+                      {e.etiqueta}<span class="solo-lectores"> (abre en otra pestaña)</span>
+                    </a>
+                  ))}
+                  {servicio && (
+                    <a class="enlace" href={rutaServicio(servicio.slug)}>
+                      Ver el servicio<span class="solo-lectores">: {servicio.nombre}</span> →
+                    </a>
+                  )}
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .tarjetas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 1.6rem;
+  }
+  .tarjeta {
+    border: 1px solid var(--linea);
+    border-top: 4px solid var(--terracota);
+    border-radius: 0 0 0.6rem 0.6rem;
+    background: #fff;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .tipo {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--terracota-texto);
+    margin: 0 0 0.4rem;
+  }
+  h3 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+  .cliente { margin: 0 0 0.6rem; font-size: 0.92rem; color: var(--tinta); font-weight: 600; }
+  .desc { margin: 0 0 1.2rem; color: var(--gris); }
+  .plat-t { margin: 0 0 0.4rem; font-size: 0.85rem; font-weight: 600; }
+  .plataformas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .plataformas li {
+    font-size: 0.85rem;
+    border: 1px solid var(--linea);
+    border-radius: 2rem;
+    padding: 0.2rem 0.7rem;
+    color: var(--tinta);
+  }
+  .enlaces {
+    margin: auto 0 0;
+    padding-top: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    font-size: 0.95rem;
+  }
+</style>

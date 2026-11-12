@@ -2,6 +2,7 @@
 const enlaces = [
   { href: "/servicios", texto: "Servicios" },
   { href: "/precios", texto: "Precios" },
+  { href: "/nosotros", texto: "Nosotros" },
   { href: "/contacto", texto: "Contacto" },
 ];
 const actual = Astro.url.pathname;
@@ -28,7 +29,7 @@ const esActual = (href: string) => actual === href || actual.startsWith(href + "
       {enlaces.map((e) => (
         <a href={e.href} aria-current={esActual(e.href) ? "page" : undefined}>{e.texto}</a>
       ))}
-      <a class="btn btn-primario btn-sm" href="/contacto">Cotizar</a>
+      <a class="btn btn-primario btn-sm" href="/cotizar" aria-current={esActual("/cotizar") ? "page" : undefined}>Cotizar</a>
     </nav>
   </div>
 </header>
@@ -79,7 +80,7 @@ const esActual = (href: string) => actual === href || actual.startsWith(href + "
     border-bottom: 2px solid transparent;
   }
   .menu a:not(.btn):hover { color: #fff; }
-  .menu a[aria-current="page"] { color: #fff; border-bottom-color: var(--terracota-claro); }
+  .menu a:not(.btn)[aria-current="page"] { color: #fff; border-bottom-color: var(--terracota-claro); }
 
   .menu-btn {
     display: none;

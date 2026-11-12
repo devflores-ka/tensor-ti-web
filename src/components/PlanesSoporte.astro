@@ -8,7 +8,7 @@ import {
   formatoUF,
   type Limites,
 } from "../data/planes";
-import { contactoUrl } from "../lib/contacto";
+import { cotizarUrl } from "../lib/contacto";
 
 const limitesDefinidos = (l: Limites) =>
   (Object.keys(l) as (keyof Limites)[]).filter((k) => l[k]).map((k) => [etiquetasLimites[k], l[k]] as const);
@@ -36,7 +36,7 @@ const limitesDefinidos = (l: Limites) =>
           </dl>
         )}
         <div class="acciones-plan">
-          <a class="btn btn-primario btn-sm" href={contactoUrl({ servicio: "soporte-ti", plan: p.id })}>
+          <a class="btn btn-primario btn-sm" href={cotizarUrl({ servicio: "soporte-ti", plan: p.id })}>
             Cotizar plan {p.nombre}
           </a>
           <a class="enlace" href={`/precios?plan=${p.id}#cotizador`}>Configurar</a>

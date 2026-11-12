@@ -1,0 +1,100 @@
+---
+// Sección "Quiénes somos": la empresa y su representante.
+// En el inicio se muestra la versión breve con enlace a /nosotros;
+// en /nosotros, la versión completa (`completo`).
+import { site } from "../data/site";
+
+interface Props {
+  completo?: boolean;
+}
+const { completo = false } = Astro.props;
+const r = site.representante;
+---
+<section id="quienes-somos" class="quienes">
+  <div class="wrap grid">
+    <div class="texto">
+      <p class="etiqueta">Quiénes somos</p>
+      <h2>Una empresa joven de Tarapacá</h2>
+      <p>
+        {site.razonSocial} es una empresa nueva, con base en Pozo Almonte. Hacemos dos cosas:
+        soporte informático en terreno, donde están los equipos y las personas que los usan,
+        y desarrollo de software a medida para procesos que hoy se resuelven a mano.
+      </p>
+      <p>
+        Somos un equipo pequeño y lo decimos de frente: tomamos los trabajos que podemos
+        cumplir, acordamos el alcance por escrito y dejamos registro de lo que hacemos.
+      </p>
+      {completo && (
+        <>
+          <p>
+            Estar en la región nos permite llegar a Pozo Almonte, Iquique, Alto Hospicio y
+            otras comunas de Tarapacá sin los costos y tiempos de traer a alguien desde fuera.
+            Los servicios de desarrollo y hosting los prestamos a distancia en todo Chile.
+          </p>
+          <p>
+            Participamos en compras públicas a través de Mercado Público y buscamos crecer
+            también en el sector privado, incluidas la minería y sus empresas contratistas.
+          </p>
+        </>
+      )}
+      {!completo && (
+        <p class="mas"><a class="enlace" href="/nosotros">Más sobre nosotros →</a></p>
+      )}
+    </div>
+
+    <aside class="ficha" aria-labelledby="ficha-nombre">
+      <p class="ficha-etq">{r.cargo}</p>
+      <h3 id="ficha-nombre">{r.nombre}</h3>
+      <dl>
+        <div>
+          <dt>Título</dt>
+          <dd>{r.titulo}</dd>
+        </div>
+        <div>
+          <dt>Formación</dt>
+          <dd>{r.formacion}</dd>
+        </div>
+        <div>
+          <dt>Experiencia</dt>
+          <dd>
+            <ul>
+              {r.experiencia.map((e) => <li>{e}</li>)}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .quienes { background: var(--papel-2); }
+  .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 3.5rem; align-items: start; }
+  h2 { margin-bottom: 1.4rem; }
+  .texto p:not(.etiqueta) { margin: 0 0 1rem; max-width: 40rem; color: var(--gris); }
+  .texto .mas { margin-top: 1.6rem; }
+
+  .ficha {
+    background: var(--papel);
+    border-top: 4px solid var(--azul);
+    border-radius: 0 0 0.6rem 0.6rem;
+    padding: 1.6rem 1.6rem 1.4rem;
+  }
+  .ficha-etq {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--terracota-texto);
+    margin: 0 0 0.4rem;
+  }
+  h3 { font-size: 1.35rem; margin-bottom: 1.2rem; }
+  dl { margin: 0; display: grid; gap: 1rem; }
+  dt { font-size: 0.85rem; font-weight: 600; color: var(--tinta); }
+  dd { margin: 0.15rem 0 0; color: var(--gris); }
+  dd ul { margin: 0.2rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.4rem; }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>

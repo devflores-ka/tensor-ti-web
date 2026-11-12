@@ -1,0 +1,64 @@
+---
+// Confirmación después de enviar /cotizar. El folio llega en ?folio=.
+import Base from "../../layouts/Base.astro";
+import PageHero from "../../components/PageHero.astro";
+import { site } from "../../data/site";
+---
+<Base
+  title="Solicitud enviada | Tensor TI"
+  description="Recibimos tu solicitud de cotización."
+  path="/cotizar/enviado"
+  noindex
+>
+  <PageHero
+    etiqueta="Solicitud enviada"
+    titulo="Recibimos tu solicitud"
+    lead="Te responderemos al correo que indicaste con la cotización o con las preguntas que necesitemos para prepararla."
+  />
+
+  <section>
+    <div class="wrap contenido">
+      <p class="folio" id="folio" hidden>
+        Número de solicitud: <strong id="folio-valor"></strong>
+      </p>
+      <p>
+        Guarda este número por si necesitas escribirnos sobre la solicitud. Si es urgente o
+        tienes que agregar información, escríbenos a{" "}
+        <a class="enlace" href={`mailto:${site.email}`}>{site.email}</a> o llámanos al{" "}
+        <a class="enlace" href={`tel:${site.telefonoLink}`}>{site.telefono}</a>.
+      </p>
+      <div class="acciones">
+        <a class="btn btn-secundario" href="/">Volver al inicio</a>
+        <a class="btn btn-secundario" href="/servicios">Ver servicios</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contenido { max-width: 46rem; }
+  .contenido p { margin: 0 0 1.2rem; color: var(--gris); }
+  .folio {
+    font-size: 1.1rem;
+    color: var(--tinta) !important;
+    border-left: 4px solid var(--terracota);
+    background: #fff;
+    padding: 1rem 1.2rem;
+    border-radius: 0 0.4rem 0.4rem 0;
+  }
+  .folio strong { font-family: var(--mono); letter-spacing: 0.02em; }
+  .acciones { margin-top: 1.8rem; }
+</style>
+
+<script>
+  const folio = new URLSearchParams(location.search).get("folio") ?? "";
+  // Solo se muestra si tiene el formato esperado (WEB-AAAAMMDD-XXXX).
+  if (/^WEB-\d{8}-[0-9A-F]{4}$/.test(folio)) {
+    const valor = document.getElementById("folio-valor");
+    const caja = document.getElementById("folio");
+    if (valor && caja) {
+      valor.textContent = folio;
+      caja.hidden = false;
+    }
+  }
+</script>

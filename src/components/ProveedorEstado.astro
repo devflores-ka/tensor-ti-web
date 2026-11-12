@@ -1,0 +1,116 @@
+---
+// Sección "Proveedor del Estado": datos para que un organismo público nos
+// encuentre en Mercado Público y nos invite a cotizar.
+import { site } from "../data/site";
+import { mailtoUrl } from "../lib/contacto";
+
+const correoCotizacion = mailtoUrl(
+  "Invitación a cotizar (Mercado Público)",
+  "Organismo:\nID de la compra en Mercado Público:\nFecha de cierre:\nDetalle del requerimiento:\n",
+);
+---
+<section id="proveedor-estado" class="estado oscuro">
+  <div class="wrap grid">
+    <div>
+      <p class="etiqueta">Proveedor del Estado</p>
+      <h2>Inscritos en Mercado Público</h2>
+      <p class="texto">
+        Estamos inscritos como proveedores en Mercado Público y cotizamos en Compra Ágil.
+        Si tu organismo publica una compra, puede invitarnos a cotizar buscándonos por RUT,
+        o enviarnos el ID de la compra por correo y te respondemos dentro del plazo.
+      </p>
+      <div class="acciones">
+        <a class="btn btn-primario" href={correoCotizacion}>Enviar una invitación por correo</a>
+      </div>
+    </div>
+
+    <dl class="datos">
+      <div>
+        <dt>Razón social</dt>
+        <dd>{site.razonSocial}</dd>
+      </div>
+      <div>
+        <dt>RUT</dt>
+        <dd class="rut">
+          <span id="rut-empresa">{site.rut}</span>
+          <button type="button" class="copiar" data-copiar="rut-empresa" hidden>
+            Copiar RUT
+          </button>
+          <span class="copiado" role="status" aria-live="polite"></span>
+        </dd>
+      </div>
+      <div>
+        <dt>Modalidades</dt>
+        <dd>Compra Ágil y otras compras publicadas en Mercado Público</dd>
+      </div>
+      <div>
+        <dt>Correo para invitaciones</dt>
+        <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .estado { background: var(--azul); color: #fff; }
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 3.5rem; align-items: center; }
+  h2 { margin-bottom: 1.2rem; }
+  .texto { margin: 0 0 1.8rem; max-width: 38rem; color: rgba(255, 255, 255, 0.85); }
+
+  .datos {
+    margin: 0;
+    display: grid;
+    gap: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.6rem;
+    padding: 1.6rem;
+  }
+  dt {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--terracota-claro);
+  }
+  dd { margin: 0.2rem 0 0; }
+  dd a { color: #fff; text-underline-offset: 0.2em; }
+  .rut { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.9rem; }
+  .rut #rut-empresa { font-family: var(--mono); font-size: 1.35rem; letter-spacing: 0.02em; }
+  .copiar {
+    font: inherit;
+    font-size: 0.85rem;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+  .copiar:hover { background: rgba(255, 255, 255, 0.1); }
+  .copiado { font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>
+
+<script>
+  // El botón solo aparece si el navegador permite copiar al portapapeles.
+  if (navigator.clipboard) {
+    document.querySelectorAll<HTMLButtonElement>("[data-copiar]").forEach((boton) => {
+      const origen = document.getElementById(boton.dataset.copiar ?? "");
+      const aviso = boton.parentElement?.querySelector(".copiado");
+      if (!origen) return;
+      boton.hidden = false;
+      boton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(origen.textContent?.trim() ?? "");
+          if (aviso) aviso.textContent = "Copiado";
+        } catch {
+          if (aviso) aviso.textContent = "No se pudo copiar";
+        }
+        setTimeout(() => { if (aviso) aviso.textContent = ""; }, 2500);
+      });
+    });
+  }
+</script>

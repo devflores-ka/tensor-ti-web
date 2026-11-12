@@ -14,13 +14,13 @@ const minimo = planes
 
 const descripcion =
   planesConfig.mostrarPrecios && minimo !== undefined
-    ? `Planes de soporte TI mensual desde ${formatoUF(minimo)} ${planesConfig.unidad} y cotizador de servicios: soporte, redes, CCTV, mantención y auditoría.`
-    : "Planes de soporte TI mensual y cotizador de servicios: soporte, redes, CCTV, mantención y auditoría, con estimación transparente.";
+    ? `Soporte TI mensual desde ${formatoUF(minimo)} ${planesConfig.unidad} para empresas de Iquique, Alto Hospicio y Pozo Almonte. Cotizador de soporte, redes, CCTV y mantención.`
+    : "Planes de soporte TI mensual para empresas de Iquique, Alto Hospicio y Pozo Almonte, y cotizador de soporte, redes, CCTV y mantención con estimación clara.";
 
 const migas = [{ nombre: "Inicio", href: "/" }, { nombre: "Precios" }];
 ---
 <Base
-  title="Precios y cotizador de servicios TI | Tensor TI"
+  title="Precios de soporte TI en Tarapacá | Tensor TI"
   description={descripcion}
   path="/precios"
   jsonLd={[

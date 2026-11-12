@@ -14,6 +14,14 @@ export function mailtoUrl(asunto = "Consulta desde tensorti.cl", cuerpo = ""): s
   return cuerpo ? `${base}&body=${encodeURIComponent(cuerpo)}` : base;
 }
 
+/** Enlace a /cotizar con datos prellenados (servicio, plan, detalle). */
+export function cotizarUrl(params: Record<string, string | undefined> = {}): string {
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v) q.set(k, v);
+  const qs = q.toString();
+  return qs ? `/cotizar?${qs}` : "/cotizar";
+}
+
 /** Enlace a /contacto con datos prellenados (servicio, plan, detalle). */
 export function contactoUrl(params: Record<string, string | undefined> = {}): string {
   const q = new URLSearchParams();
